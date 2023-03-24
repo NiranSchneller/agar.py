@@ -3,9 +3,10 @@ from constants import *
 from player import Player
 from playerCamera import PlayerCamera
 
+
 def update_window(player, playerCamera):
     playerCamera.update_window(player.get_position())
-    player.execute(PLAYER_COLOR, playerCamera.window)
+    player.execute(PlayerConstants.PLAYER_COLOR, playerCamera.window)
     pygame.display.flip()
 
 
@@ -19,5 +20,5 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 running = False
         update_window(player, playerCamera)
-        clock.tick(FPS)
+        clock.tick(GameSettings.FPS)
     pygame.quit()

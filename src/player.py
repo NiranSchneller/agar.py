@@ -9,7 +9,7 @@ from constants import *
     
 """
 def mathematical_velocity_stretcher(distance):
-    return (1/DISTANCE_THRESHOLD**2) * (distance**2)
+    return (1/PlayerConstants.DISTANCE_THRESHOLD**2) * (distance**2)
 
 """
     Returns Euclidean distance between two points
@@ -26,11 +26,11 @@ def get_distance(pos1, pos2):
 class Player:
     def __init__(self, name): # velocity measured in pixels per second
         self.name = name
-        self.velocity = math.fabs(PLAYER_VELOCITY)
+        self.velocity = math.fabs(PlayerConstants.PLAYER_VELOCITY)
         # actual player pos goes by the platform he is on
-        self.x = PLATFORM_WIDTH / 2
-        self.y = PLATFORM_HEIGHT / 2
-        self.radius = PLAYER_STARTING_RADIUS
+        self.x = PlatformConstants.PLATFORM_WIDTH / 2
+        self.y = PlatformConstants.PLATFORM_HEIGHT / 2
+        self.radius = PlayerConstants.PLAYER_STARTING_RADIUS
 
 
     """
@@ -43,18 +43,22 @@ class Player:
         dx, dy = pygame.mouse.get_pos()
         # Magnitude of velocity with direction of mouse
 
-        angle = math.atan2(dy - PLAYER_CAMERA_HEIGHT / 2, dx - PLAYER_CAMERA_WIDTH / 2)
-        distance = get_distance((PLAYER_CAMERA_WIDTH / 2, PLAYER_CAMERA_HEIGHT / 2), (dx, dy))
-        if distance < DISTANCE_THRESHOLD:
+        angle = math.atan2(dy - PlayerCameraConstants.PLAYER_CAMERA_HEIGHT / 2,
+                           dx - PlayerCameraConstants.PLAYER_CAMERA_WIDTH / 2)
+
+        distance = get_distance((PlayerCameraConstants.PLAYER_CAMERA_WIDTH / 2,
+                                 PlayerCameraConstants.PLAYER_CAMERA_HEIGHT / 2), (dx, dy))
+        if distance < PlayerConstants.DISTANCE_THRESHOLD:
             self.velocity = 0
         else:
-            self.velocity = PLAYER_VELOCITY
+            self.velocity = PlayerConstants.PLAYER_VELOCITY
 
         self.x += self.velocity * math.cos(angle)
         self.y += self.velocity * math.sin(angle)
 
     def draw(self, color, surface):
-        pygame.draw.circle(surface, color, (PLAYER_CAMERA_WIDTH / 2, PLAYER_CAMERA_HEIGHT / 2), self.radius)
+        pygame.draw.circle(surface, color, (PlayerCameraConstants.PLAYER_CAMERA_WIDTH / 2
+                                            , PlayerCameraConstants.PLAYER_CAMERA_HEIGHT / 2), self.radius)
 
     """
         Runs periodically, HAS to be called by the game handler
