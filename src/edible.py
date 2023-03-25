@@ -22,24 +22,6 @@ class Edible:
         self.color = color
 
     """
-        This function decides if this edible should be drawn by the player camera.
-        Decides by distance and a threshold
-    """
-    def should_be_drawn(self, player_pose):
-        distance_from_player = get_distance(player_pose, (self.x, self.y))
-        distance_threshold_x = max(math.fabs(self.x - player_pose[0]),
-                                math.fabs(PlayerCameraConstants.PLAYER_CAMERA_WIDTH / 2))
-        distance_threshold_y = max(math.fabs(self.y - player_pose[1]),
-                                math.fabs(PlayerCameraConstants.PLAYER_CAMERA_HEIGHT / 2))
-        distance_threshold_to_draw = get_distance(player_pose, (distance_threshold_x, distance_threshold_y))
-
-        if distance_from_player < distance_threshold_to_draw:
-            return True
-        else:
-            return False
-
-
-    """
         Runs periodically, takes in camera coords and decides if to draw or not
     """
     def run(self, surface, camera_pos):
@@ -47,6 +29,8 @@ class Edible:
         if not camera_relative_position[0] < 0:
             self.draw(surface, camera_relative_position)
 
+    def should_be_eaten(self, player_pos, player_radius):
+        return get_distance(player_pos, (self.x, self.y)) < player_radius
 
     """
         Defines the position in player camera coords

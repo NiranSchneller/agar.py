@@ -22,6 +22,7 @@ class PlayerConstants:
 class EdibleConstants:
     EDIBLE_RADIUS = 4
     EDIBLE_COLOR = (0,0,0)
+    AMOUNT_OF_EDIBLES = 4000
 
 
 class PlatformConstants:
