@@ -45,3 +45,5 @@ class Edible:
         pygame.draw.circle(surface, self.color, (camera_relative_pos[0],
                                                  camera_relative_pos[1]), EdibleConstants.EDIBLE_RADIUS)
 
+    def __str__(self):
+        return f"{self.x},{self.y}"

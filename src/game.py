@@ -2,7 +2,7 @@ from constants import *
 from player import Player
 from playerCamera import PlayerCamera
 from edible import Edible
-
+import random
 pygame.init()
 score = 0
 FONT = pygame.font.SysFont('arial', 40)
@@ -28,6 +28,7 @@ def update_edibles(player, playerCamera, edibles):
         if edible.should_be_eaten(player.get_position(), player.radius):
             eat_edible(edible)
             edibles.remove(edible)
+            edibles.append(generate_random_edible())
 
 def eat_edible(edible):
     global score
@@ -41,12 +42,14 @@ def eat_edible(edible):
 def init_edibles():
     edibles = []
 
-
-
+    for i in range(EdibleConstants.AMOUNT_OF_EDIBLES):
+        edibles.append(generate_random_edible())
+    return edibles
 
 def generate_random_edible():
-
-    return Edible(x,y,EdibleConstants.EDIBLE_COLOR)
+    radius = EdibleConstants.EDIBLE_RADIUS
+    return Edible(random.randint(radius, PlatformConstants.PLATFORM_WIDTH - radius),
+                  random.randint(radius, PlatformConstants.PLATFORM_HEIGHT - radius), EdibleConstants.EDIBLE_COLOR)
 
 """
     Runs main.
@@ -55,9 +58,8 @@ if __name__ == '__main__':
     running = True
     player = Player("Niran")
     playerCamera = PlayerCamera()
-    edible = Edible(PlatformConstants.PLATFORM_WIDTH / 2 + 100, PlatformConstants.PLATFORM_HEIGHT / 2 + 100,
-                    EdibleConstants.EDIBLE_COLOR)
-    edibles = [edible]
+    edibles = init_edibles()
+    print(edibles[0])
     clock = pygame.time.Clock()
     while running:
         for event in pygame.event.get():

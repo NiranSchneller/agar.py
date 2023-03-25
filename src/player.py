@@ -67,6 +67,7 @@ class Player:
         self.move()
         #print(f"Player pos: {self.x},{self.y}" )
         self.draw(drawColor, surface)
+        print(f'{self.x},{self.y}')
 
     def get_position(self):
         return self.x, self.y
