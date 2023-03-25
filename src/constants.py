@@ -17,7 +17,7 @@ class PlayerConstants:
     PLAYER_LOCATION_CAMERA = (PlayerCameraConstants.PLAYER_CAMERA_WIDTH / 2, PlayerCameraConstants.PLAYER_CAMERA_HEIGHT / 2)
     PLAYER_STARTING_RADIUS = 100
     DISTANCE_THRESHOLD = PLAYER_VELOCITY
-
+    EDIBLE_EATEN_RADIUS_ADDER = 5
 
 class EdibleConstants:
     EDIBLE_RADIUS = 4

@@ -32,6 +32,8 @@ class Player:
         self.radius = PlayerConstants.PLAYER_STARTING_RADIUS
 
 
+
+
     """
         Function calculates current position change with respect to the mouse (follower)
         and current velocity
@@ -67,7 +69,11 @@ class Player:
         self.move()
         #print(f"Player pos: {self.x},{self.y}" )
         self.draw(drawColor, surface)
-        print(f'{self.x},{self.y}')
+
+
+    def eat(self):
+        self.radius += PlayerConstants.EDIBLE_EATEN_RADIUS_ADDER
+
 
     def get_position(self):
         return self.x, self.y

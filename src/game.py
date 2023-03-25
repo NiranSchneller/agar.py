@@ -26,15 +26,14 @@ def update_edibles(player, playerCamera, edibles):
     for edible in edibles:
         edible.run(playerCamera.window, playerCamera.get_position())
         if edible.should_be_eaten(player.get_position(), player.radius):
-            eat_edible(edible)
+            eat_edible(edible, player)
             edibles.remove(edible)
             edibles.append(generate_random_edible())
 
-def eat_edible(edible):
+def eat_edible(edible, player):
     global score
     score += 1
-
-
+    player.eat()
 
 """
     Random distribution of edibles across the map
@@ -59,7 +58,6 @@ if __name__ == '__main__':
     player = Player("Niran")
     playerCamera = PlayerCamera()
     edibles = init_edibles()
-    print(edibles[0])
     clock = pygame.time.Clock()
     while running:
         for event in pygame.event.get():
