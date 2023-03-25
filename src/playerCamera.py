@@ -16,7 +16,16 @@ class PlayerCamera:
     """
     def update_window(self, player_pos):
         self.window.fill(PlayerCameraConstants.BACKGROUND_COLOR)
+        self.update_position(player_pos)
         self.draw_grids(player_pos)
+
+    """
+        Updates position according to player coords
+        Position is saved in Platform coordinates, to determine actual location
+    """
+    def update_position(self, player_pos):
+        self.x = player_pos[0] - PlayerConstants.PLAYER_LOCATION_CAMERA[0]
+        self.y = player_pos[1] - PlayerConstants.PLAYER_LOCATION_CAMERA[1]
 
     """
      Draws grid lines in players FOV
@@ -33,3 +42,7 @@ class PlayerCamera:
             pygame.draw.line(self.window, PlayerCameraConstants.GRID_LINE_COLOR, (0, y),
                              (PlayerCameraConstants.PLAYER_CAMERA_WIDTH, y))
             y += PlayerCameraConstants.WINDOW_GRID_SPACING
+
+    def get_position(self):
+        return self.x, self.y
+

@@ -16,8 +16,7 @@ def mathematical_velocity_stretcher(distance):
     positions in: (x,y)
 """
 def get_distance(pos1, pos2):
-    return ((pos1[0] - pos2[0])**2 + (pos1[1] - pos2[1])**2)**0.5
-
+    return math.hypot(pos1[0] - pos2[0], pos1[1] - pos2[1])
 
 """
     Player class
@@ -57,14 +56,16 @@ class Player:
         self.y += self.velocity * math.sin(angle)
 
     def draw(self, color, surface):
-        pygame.draw.circle(surface, color, (PlayerCameraConstants.PLAYER_CAMERA_WIDTH / 2
-                                            , PlayerCameraConstants.PLAYER_CAMERA_HEIGHT / 2), self.radius)
+        pygame.draw.circle(surface, color, PlayerConstants.PLAYER_LOCATION_CAMERA, self.radius)
+        pygame.draw.circle(surface, PlayerConstants.PLAYER_OUTLINE_COLOR, PlayerConstants.PLAYER_LOCATION_CAMERA, self.radius,
+                           PlayerConstants.PLAYER_STARTING_OUTLINE_THICKNESS)
 
     """
         Runs periodically, HAS to be called by the game handler
     """
     def execute(self, drawColor, surface):
         self.move()
+        #print(f"Player pos: {self.x},{self.y}" )
         self.draw(drawColor, surface)
 
     def get_position(self):
