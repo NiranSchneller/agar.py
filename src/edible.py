@@ -21,22 +21,10 @@ class Edible:
         self.y = y
         self.color = color
 
-    """
-        Runs periodically, takes in camera coords and decides if to draw or not
-    """
-    def run(self, surface, camera_pos):
-        camera_relative_position = self.platform_to_player_camera(camera_pos)
-        if not camera_relative_position[0] < 0:
-            self.draw(surface, camera_relative_position)
 
     def should_be_eaten(self, player_pos, player_radius):
-        return get_distance(player_pos, (self.x, self.y)) < player_radius
+        return get_distance(player_pos, (self.x, self.y)) < player_radius + self.radius
 
-    """
-        Defines the position in player camera coords
-    """
-    def platform_to_player_camera(self, camera_pos):
-        return (self.x - camera_pos[0]), (self.y - camera_pos[1])
 
     """
         Draw on screen, accepts camera relative coords

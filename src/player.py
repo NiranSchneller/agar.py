@@ -33,7 +33,6 @@ class Player:
 
 
 
-
     """
         Function calculates current position change with respect to the mouse (follower)
         and current velocity
@@ -44,11 +43,11 @@ class Player:
         dx, dy = pygame.mouse.get_pos()
         # Magnitude of velocity with direction of mouse
 
-        angle = math.atan2(dy - PlayerCameraConstants.PLAYER_CAMERA_HEIGHT / 2,
-                           dx - PlayerCameraConstants.PLAYER_CAMERA_WIDTH / 2)
+        angle = math.atan2(dy - PlayerCameraConstants.SCREEN_HEIGHT / 2,
+                           dx - PlayerCameraConstants.SCREEN_WIDTH / 2)
 
-        distance = get_distance((PlayerCameraConstants.PLAYER_CAMERA_WIDTH / 2,
-                                 PlayerCameraConstants.PLAYER_CAMERA_HEIGHT / 2), (dx, dy))
+        distance = get_distance((PlayerCameraConstants.SCREEN_WIDTH / 2,
+                                 PlayerCameraConstants.SCREEN_HEIGHT / 2), (dx, dy))
         if distance < PlayerConstants.DISTANCE_THRESHOLD:
             self.velocity = 0
         else:
@@ -58,6 +57,8 @@ class Player:
         self.y += self.velocity * math.sin(angle)
 
     def draw(self, color, surface):
+
+
         pygame.draw.circle(surface, color, PlayerConstants.PLAYER_LOCATION_CAMERA, self.radius)
         pygame.draw.circle(surface, PlayerConstants.PLAYER_OUTLINE_COLOR, PlayerConstants.PLAYER_LOCATION_CAMERA, self.radius,
                            PlayerConstants.PLAYER_STARTING_OUTLINE_THICKNESS)
@@ -72,8 +73,7 @@ class Player:
 
 
     def eat(self):
-        self.radius += PlayerConstants.EDIBLE_EATEN_RADIUS_ADDER
-
+        self.radius = ((math.pi * self.radius**2 + math.pi * EdibleConstants.EDIBLE_RADIUS**2) / math.pi)**0.5
 
     def get_position(self):
         return self.x, self.y

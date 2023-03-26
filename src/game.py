@@ -7,11 +7,11 @@ pygame.init()
 score = 0
 FONT = pygame.font.SysFont('arial', 40)
 
-def update_window(player, playerCamera, edibles):
-    playerCamera.update_window(player.get_position())
-    update_edibles(player, playerCamera, edibles)
-    player.execute(PlayerConstants.PLAYER_COLOR, playerCamera.window)
-    update_score(playerCamera.window)
+def update_window(player, player_camera, edibles):
+    player_camera.update_window(player.get_position())
+    update_edibles(player, player_camera, edibles)
+    player.execute(PlayerConstants.PLAYER_COLOR, player_camera.window)
+    update_score(player_camera.window)
     pygame.display.flip()
 
 
@@ -22,12 +22,13 @@ def update_score(player_camera_window):
     player_camera_window.blit(text, text_rect)
 
 
-def update_edibles(player, playerCamera, edibles):
+def update_edibles(player, player_camera, edibles):
     for edible in edibles:
-        edible.run(playerCamera.window, playerCamera.get_position())
+        player_camera.draw_edible(edible)
         if edible.should_be_eaten(player.get_position(), player.radius):
             eat_edible(edible, player)
             edibles.remove(edible)
+            player_camera.edible_eaten(5, 5) # Reports to the player camera that an edible has been eaten
             edibles.append(generate_random_edible())
 
 def eat_edible(edible, player):
@@ -56,13 +57,13 @@ def generate_random_edible():
 if __name__ == '__main__':
     running = True
     player = Player("Niran")
-    playerCamera = PlayerCamera()
+    player_camera = PlayerCamera()
     edibles = init_edibles()
     clock = pygame.time.Clock()
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        update_window(player, playerCamera, edibles)
+        update_window(player, player_camera, edibles)
         clock.tick(GameSettings.FPS)
     pygame.quit()

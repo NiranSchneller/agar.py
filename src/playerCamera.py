@@ -1,14 +1,24 @@
-import pygame
 from constants import *
 
 
+"""
+    This class represents the player camera.
+    It manages every 'Drawable', including the functionality of making the camera bigger and smaller.
+    To do this, it's position is modified when the player gets bigger, 
+"""
+
 class PlayerCamera:
+
+
     def __init__(self):
-        self.window = pygame.display.set_mode((PlayerCameraConstants.PLAYER_CAMERA_WIDTH,
-                                               PlayerCameraConstants.PLAYER_CAMERA_HEIGHT))
+        self.window = pygame.display.set_mode((PlayerCameraConstants.SCREEN_WIDTH,
+                                               PlayerCameraConstants.SCREEN_HEIGHT))
         pygame.display.set_caption(GameSettings.GAME_NAME)
         self.x = 0
         self.y = 0
+        self.width = PlayerCameraConstants.SCREEN_WIDTH
+        self.height = PlayerCameraConstants.SCREEN_HEIGHT
+
 
     """
         Periodic function, player camera moves with player
@@ -17,32 +27,62 @@ class PlayerCamera:
     def update_window(self, player_pos):
         self.window.fill(PlayerCameraConstants.BACKGROUND_COLOR)
         self.update_position(player_pos)
-        self.draw_grids(player_pos)
+        #self.draw_grids(player_pos)
+        #print(f"{self.width},{self.height}")
+
+
+    """
+        Increases height and width of the camera
+    """
+    def edible_eaten(self, increase_width, increase_height):
+        #self.width += increase_width / 2.0
+        pass
+        #self.height += increase_height / 2.0
+
+
+    def draw_edible(self, edible):
+        camera_relative_position = self.platform_to_player_camera(self.get_position(), edible)
+        if not camera_relative_position[0] < 0:
+           edible.draw(self.window, camera_relative_position)
+
+    """
+        Defines the position in player camera coords
+    """
+    def platform_to_player_camera(self, camera_pos, edible):
+        return (edible.x - camera_pos[0]), (edible.y - camera_pos[1])
 
     """
         Updates position according to player coords
         Position is saved in Platform coordinates, to determine actual location
     """
     def update_position(self, player_pos):
-        self.x = player_pos[0] - PlayerConstants.PLAYER_LOCATION_CAMERA[0]
-        self.y = player_pos[1] - PlayerConstants.PLAYER_LOCATION_CAMERA[1]
+        self.x = player_pos[0] - self.width / 2
+        self.y = player_pos[1] - self.height / 2
 
     """
      Draws grid lines in players FOV
      this is important because it simulates the players movement on the screen by changing the arrangement of the lines
     """
     def draw_grids(self, player_pos):
+        # Amount of lines that need to be drawn in order to simulate changing camera size
+        amount_of_lines_x = self.width / PlayerCameraConstants.WINDOW_GRID_SPACING
+        amount_of_lines_y = self.height / PlayerCameraConstants.WINDOW_GRID_SPACING
+
+        # Scaling spacing by the width and height of the screen.
+        window_grid_spacing_x = PlayerCameraConstants.SCREEN_WIDTH / amount_of_lines_x
+        window_grid_spacing_y = PlayerCameraConstants.SCREEN_HEIGHT / amount_of_lines_y
+        print(f"Spacing: {window_grid_spacing_x},{window_grid_spacing_y}")
+
         x = PlayerCameraConstants.WINDOW_GRID_SPACING - (player_pos[0] % PlayerCameraConstants.WINDOW_GRID_SPACING)
         y = PlayerCameraConstants.WINDOW_GRID_SPACING - (player_pos[1] % PlayerCameraConstants.WINDOW_GRID_SPACING)
-        while x < PlayerCameraConstants.PLAYER_CAMERA_WIDTH:
+        while x < PlayerCameraConstants.SCREEN_WIDTH:
             pygame.draw.line(self.window, PlayerCameraConstants.GRID_LINE_COLOR, (x, 0),
-                             (x, PlayerCameraConstants.PLAYER_CAMERA_HEIGHT))
-            x += PlayerCameraConstants.WINDOW_GRID_SPACING
-        while y < PlayerCameraConstants.PLAYER_CAMERA_HEIGHT:
+                             (x, PlayerCameraConstants.SCREEN_HEIGHT))
+            x += window_grid_spacing_x
+        while y < PlayerCameraConstants.SCREEN_HEIGHT:
             pygame.draw.line(self.window, PlayerCameraConstants.GRID_LINE_COLOR, (0, y),
-                             (PlayerCameraConstants.PLAYER_CAMERA_WIDTH, y))
-            y += PlayerCameraConstants.WINDOW_GRID_SPACING
+                             (PlayerCameraConstants.SCREEN_WIDTH, y))
+            y += window_grid_spacing_y
 
     def get_position(self):
         return self.x, self.y
-
