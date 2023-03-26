@@ -16,22 +16,23 @@ def get_distance(pos1, pos2):
 """
 class Edible:
     def __init__(self, x, y, color):
-        self.radius = PlayerConstants.PLAYER_STARTING_RADIUS / 10
-        self.x = x
-        self.y = y
+        self.radius = EdibleConstants.EDIBLE_RADIUS
+        self.platform_x = x
+        self.platform_y = y
         self.color = color
 
-
     def should_be_eaten(self, player_pos, player_radius):
-        return get_distance(player_pos, (self.x, self.y)) < player_radius + self.radius
+        return get_distance(player_pos, (self.platform_x, self.platform_y)) < player_radius + self.radius
 
+    def print_distance(self, player_pos, player_radius):
+        print(f"Distance: {get_distance(player_pos, (self.platform_x, self.platform_y))}")
 
     """
         Draw on screen, accepts camera relative coords
     """
-    def draw(self, surface, camera_relative_pos):
-        pygame.draw.circle(surface, self.color, (camera_relative_pos[0],
-                                                 camera_relative_pos[1]), EdibleConstants.EDIBLE_RADIUS)
+    def draw(self, surface, screen_relative_pos, radius):
+        pygame.draw.circle(surface, self.color, (screen_relative_pos[0],
+                                                 screen_relative_pos[1]), radius)
 
     def __str__(self):
         return f"{self.x},{self.y}"

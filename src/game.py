@@ -23,18 +23,18 @@ def update_score(player_camera_window):
 
 
 def update_edibles(player, player_camera, edibles):
+    global score
+
     for edible in edibles:
         player_camera.draw_edible(edible)
         if edible.should_be_eaten(player.get_position(), player.radius):
-            eat_edible(edible, player)
+            score += 1
+            radius_change = player.eat()
+            edible.print_distance(player.get_position(), player.radius)
+            player_camera.edible_eaten(radius_change, radius_change)
             edibles.remove(edible)
-            player_camera.edible_eaten(5, 5) # Reports to the player camera that an edible has been eaten
             edibles.append(generate_random_edible())
 
-def eat_edible(edible, player):
-    global score
-    score += 1
-    player.eat()
 
 """
     Random distribution of edibles across the map
@@ -64,6 +64,10 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    player_camera.edible_eaten(500, 500)
+
         update_window(player, player_camera, edibles)
         clock.tick(GameSettings.FPS)
     pygame.quit()

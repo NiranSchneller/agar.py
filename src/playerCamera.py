@@ -35,21 +35,30 @@ class PlayerCamera:
         Increases height and width of the camera
     """
     def edible_eaten(self, increase_width, increase_height):
-        #self.width += increase_width / 2.0
-        pass
-        #self.height += increase_height / 2.0
+        self.width += increase_width
+        self.height += increase_height
 
 
     def draw_edible(self, edible):
-        camera_relative_position = self.platform_to_player_camera(self.get_position(), edible)
+        camera_relative_position, edible_radius = self.platform_to_player_camera(self.get_position(), edible)
         if not camera_relative_position[0] < 0:
-           edible.draw(self.window, camera_relative_position)
+
+           edible.draw(self.window, camera_relative_position, edible_radius)
 
     """
-        Defines the position in player camera coords
+        transforms world coordinates to screen coordinates, takes into account camera size
     """
     def platform_to_player_camera(self, camera_pos, edible):
-        return (edible.x - camera_pos[0]), (edible.y - camera_pos[1])
+        # Get ratio
+        width_ratio = 1 / (self.width / PlayerCameraConstants.SCREEN_WIDTH)
+        camera_relative_x = edible.platform_x - self.x
+        camera_relative_y = edible.platform_y - self.y
+        # scale by ratio (screen top left 0,0)
+        screen_relative_x = camera_relative_x * width_ratio
+        screen_relative_y = camera_relative_y * width_ratio
+
+        edible_radius = edible.radius * width_ratio
+        return (screen_relative_x, screen_relative_y), edible_radius
 
     """
         Updates position according to player coords
