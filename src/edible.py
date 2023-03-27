@@ -9,6 +9,7 @@ def get_distance(pos1, pos2):
     return math.hypot(pos1[0] - pos2[0], pos1[1] - pos2[1])
 
 
+
 """
     Edible class, can be eaten by a player.
     Accepts x,y in PLATFORM coords, so it can be determined whether or not to show the edible

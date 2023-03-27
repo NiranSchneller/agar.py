@@ -13,7 +13,7 @@ FONT = pygame.font.SysFont('arial', 40)
 def update_window(player, player_camera, edibles):
     player_camera.update_window(player.get_position())
     update_edibles(player, player_camera, edibles)
-    player.execute(PlayerConstants.PLAYER_COLOR, player_camera.window)
+    player.execute(PlayerConstants.PLAYER_COLOR, player_camera.window, player_camera.coordinate_helper)
     update_score(player_camera.window)
     pygame.display.flip()
 
@@ -68,9 +68,6 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    player_camera.edible_eaten(500, 500)
 
         update_window(player, player_camera, edibles)
         clock.tick(GameSettings.FPS)
