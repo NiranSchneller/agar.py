@@ -2,8 +2,9 @@ import math
 
 from constants import *
 from player import Player
-from playerCamera import PlayerCamera
+from player_camera import PlayerCamera
 from edible import Edible
+from coordinate_system import CoordinateSystemHelper
 import random
 pygame.init()
 score = 0

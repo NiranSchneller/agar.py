@@ -33,6 +33,8 @@ class Edible:
     def draw(self, surface, screen_relative_pos, radius):
         pygame.draw.circle(surface, self.color, (screen_relative_pos[0],
                                                  screen_relative_pos[1]), radius)
+    def get_position(self):
+        return self.platform_x, self.platform_y
 
     def __str__(self):
         return f"{self.x},{self.y}"

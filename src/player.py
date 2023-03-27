@@ -58,7 +58,6 @@ class Player:
 
     def draw(self, color, surface):
 
-
         pygame.draw.circle(surface, color, PlayerConstants.PLAYER_LOCATION_CAMERA, self.radius)
         pygame.draw.circle(surface, PlayerConstants.PLAYER_OUTLINE_COLOR, PlayerConstants.PLAYER_LOCATION_CAMERA, self.radius,
                            PlayerConstants.PLAYER_STARTING_OUTLINE_THICKNESS)
