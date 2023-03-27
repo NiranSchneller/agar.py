@@ -59,8 +59,8 @@ class Player:
     def draw(self, color, surface, coordinate_helper):
         screen_radius = coordinate_helper.platform_to_screen_radius(self.radius)
         pygame.draw.circle(surface, color, PlayerConstants.PLAYER_LOCATION_CAMERA, PlayerConstants.PLAYER_STARTING_RADIUS)
-        pygame.draw.circle(surface, PlayerConstants.PLAYER_OUTLINE_COLOR, PlayerConstants.PLAYER_LOCATION_CAMERA,
-                           PlayerConstants.PLAYER_STARTING_RADIUS, PlayerConstants.PLAYER_STARTING_OUTLINE_THICKNESS)
+        pygame.draw.circle(surface, PlayerConstants.PLAYER_OUTLINE_COLOR, PlayerConstants.PLAYER_LOCATION_CAMERA, PlayerConstants.PLAYER_STARTING_RADIUS,
+                           PlayerConstants.PLAYER_STARTING_OUTLINE_THICKNESS)
 
     """
         Runs periodically, HAS to be called by the game handler
@@ -78,7 +78,5 @@ class Player:
         old_radius = self.radius
         self.radius = (((math.pi * self.radius**2 + math.pi * EdibleConstants.EDIBLE_RADIUS**2) / math.pi)**0.5)
         return self.radius - old_radius
-
-
     def get_position(self):
         return self.x, self.y

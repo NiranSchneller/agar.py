@@ -32,10 +32,10 @@ def update_edibles(player, player_camera, edibles):
         player_camera.draw_edible(edible)
         if edible.should_be_eaten(player.get_position(), player.radius):
             score += 1
-            radius_change = player.eat()
             edible.print_distance(player.get_position(), player.radius)
             player_camera.edible_eaten(player.radius / PlayerConstants.PLAYER_STARTING_RADIUS,
                                        player.radius / PlayerConstants.PLAYER_STARTING_RADIUS)
+            player.eat()
             edibles.remove(edible)
             edibles.append(generate_random_edible())
 

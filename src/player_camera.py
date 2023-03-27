@@ -23,9 +23,8 @@ class PlayerCamera:
 
         self.coordinate_helper = CoordinateSystemHelper(self)
 
-        self.interpolator = Interpolator(0.1, self.width, self.height)
-
-
+        self.width_interpolator = Interpolator(0.05, self.width)
+        self.height_interpolator = Interpolator(0.05, self.height)
 
     """
         Periodic function, player camera moves with player
@@ -34,7 +33,8 @@ class PlayerCamera:
     def update_window(self, player_pos):
         self.window.fill(PlayerCameraConstants.BACKGROUND_COLOR)
         self.update_position(player_pos)
-        self.width, self.height = self.interpolator.lerp()
+        self.width = self.width_interpolator.lerp()
+        self.height = self.height_interpolator.lerp()
         #self.draw_grids(player_pos)
         #print(f"{self.width},{self.height}")
 
@@ -46,9 +46,8 @@ class PlayerCamera:
     """
     def edible_eaten(self, width_scalar, height_scalar):
         print(f'{width_scalar},{height_scalar}')
-        self.interpolator.init_lerp(self.width, self.height,
-                                    PlayerCameraConstants.SCREEN_WIDTH * width_scalar,
-                                    PlayerCameraConstants.SCREEN_HEIGHT * height_scalar)
+        self.width_interpolator.init_lerp(self.width, PlayerCameraConstants.SCREEN_WIDTH * width_scalar)
+        self.height_interpolator.init_lerp(self.height, PlayerCameraConstants.SCREEN_HEIGHT * height_scalar)
 
     def draw_edible(self, edible):
         camera_relative_position, edible_radius = self.coordinate_helper.platform_to_screen(
