@@ -78,7 +78,6 @@ class Player:
     def eat(self):
         old_radius = self.radius
         self.radius = (((math.pi * self.radius**2 + math.pi * EdibleConstants.EDIBLE_RADIUS**2) / math.pi)**0.5)
-        print(self.radius - old_radius)
         return self.radius - old_radius
     def get_position(self):
         return self.x, self.y

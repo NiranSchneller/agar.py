@@ -1,3 +1,5 @@
+import math
+
 from constants import *
 from player import Player
 from playerCamera import PlayerCamera
@@ -31,7 +33,8 @@ def update_edibles(player, player_camera, edibles):
             score += 1
             radius_change = player.eat()
             edible.print_distance(player.get_position(), player.radius)
-            player_camera.edible_eaten(radius_change, radius_change)
+            player_camera.edible_eaten(player.radius / PlayerConstants.PLAYER_STARTING_RADIUS,
+                                       player.radius / PlayerConstants.PLAYER_STARTING_RADIUS)
             edibles.remove(edible)
             edibles.append(generate_random_edible())
 

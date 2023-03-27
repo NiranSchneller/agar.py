@@ -1,11 +1,12 @@
 from constants import *
-
+from interpolator import Interpolator
 
 """
     This class represents the player camera.
     It manages every 'Drawable', including the functionality of making the camera bigger and smaller.
     To do this, it's position is modified when the player gets bigger, 
 """
+
 
 class PlayerCamera:
 
@@ -18,6 +19,10 @@ class PlayerCamera:
         self.y = 0
         self.width = PlayerCameraConstants.SCREEN_WIDTH
         self.height = PlayerCameraConstants.SCREEN_HEIGHT
+        self.increaser = 0.1
+
+        self.interpolator = Interpolator(0.1, self.width, self.height)
+
 
 
     """
@@ -27,22 +32,25 @@ class PlayerCamera:
     def update_window(self, player_pos):
         self.window.fill(PlayerCameraConstants.BACKGROUND_COLOR)
         self.update_position(player_pos)
+        self.width, self.height = self.interpolator.lerp()
         #self.draw_grids(player_pos)
         #print(f"{self.width},{self.height}")
 
 
     """
-        Increases height and width of the camera
+        Scales height and width of the camera,
+        the scalars scale the size by the size of the screen
+        
     """
-    def edible_eaten(self, increase_width, increase_height):
-        self.width += increase_width
-        self.height += increase_height
-
+    def edible_eaten(self, width_scalar, height_scalar):
+        print(f'{width_scalar},{height_scalar}')
+        self.interpolator.init_lerp(self.width, self.height,
+                                    PlayerCameraConstants.SCREEN_WIDTH * width_scalar,
+                                    PlayerCameraConstants.SCREEN_HEIGHT * height_scalar)
 
     def draw_edible(self, edible):
         camera_relative_position, edible_radius = self.platform_to_player_camera(self.get_position(), edible)
         if not camera_relative_position[0] < 0:
-
            edible.draw(self.window, camera_relative_position, edible_radius)
 
     """
