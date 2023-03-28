@@ -48,7 +48,7 @@ class Player:
         if distance < PlayerConstants.DISTANCE_THRESHOLD:
             self.velocity = 0
         else:
-            self.velocity = PlayerConstants.PLAYER_VELOCITY
+            self.velocity = PlayerConstants.PLAYER_VELOCITY * (PlayerConstants.PLAYER_STARTING_RADIUS / self.radius)
 
         self.x += self.velocity * math.cos(angle)
         self.y += self.velocity * math.sin(angle)

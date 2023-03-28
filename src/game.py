@@ -25,7 +25,7 @@ def update_window(player, player_camera, edibles):
 
 def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
-    window.blit(img, (x,y))
+    window.blit(img, (x, y))
 
 def update_score():
     global score
@@ -75,9 +75,7 @@ def generate_random_edible():
 if __name__ == '__main__':
     running = True
 
-
     window.fill((52,78,91))
-
 
     player = Player("Niran")
     player_camera = PlayerCamera(window)
