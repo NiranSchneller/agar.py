@@ -9,8 +9,6 @@ from coordinate_system import CoordinateSystemHelper
 
 
 class PlayerCamera:
-
-
     def __init__(self):
         self.window = pygame.display.set_mode((PlayerCameraConstants.SCREEN_WIDTH,
                                                PlayerCameraConstants.SCREEN_HEIGHT))
@@ -19,7 +17,6 @@ class PlayerCamera:
         self.y = 0
         self.width = PlayerCameraConstants.SCREEN_WIDTH
         self.height = PlayerCameraConstants.SCREEN_HEIGHT
-        self.increaser = 0.1
 
         self.coordinate_helper = CoordinateSystemHelper(self)
 
@@ -35,8 +32,8 @@ class PlayerCamera:
         self.update_position(player_pos)
         self.width = self.width_interpolator.lerp()
         self.height = self.height_interpolator.lerp()
-        #self.draw_grids(player_pos)
-        #print(f"{self.width},{self.height}")
+        # self.draw_grids(player_pos)
+        # print(f"{self.width},{self.height}")
 
 
     """
@@ -54,7 +51,7 @@ class PlayerCamera:
                                                                                             edible.get_position(),
                                                                                             edible.radius)
         if not camera_relative_position[0] < 0:
-           edible.draw(self.window, camera_relative_position, edible_radius)
+            edible.draw(self.window, camera_relative_position, edible_radius)
 
     """
         Updates position according to player coords

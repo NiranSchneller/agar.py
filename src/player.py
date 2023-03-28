@@ -3,27 +3,23 @@ from constants import *
 from interpolator import Interpolator
 
 """
-    Function derived from x**2
-    when at distance threshold, value should be 1
-    so: (1/xx) * xx = 1
-    
-"""
-def mathematical_velocity_stretcher(distance):
-    return (1/PlayerConstants.DISTANCE_THRESHOLD**2) * (distance**2)
-
-"""
     Returns Euclidean distance between two points
     positions in: (x,y)
 """
+
+
 def get_distance(pos1, pos2):
     return math.hypot(pos1[0] - pos2[0], pos1[1] - pos2[1])
+
 
 """
     Player class
     Used for drawing and moving the player
 """
+
+
 class Player:
-    def __init__(self, name): # velocity measured in pixels per second
+    def __init__(self, name):  # velocity measured in pixels per second
         self.name = name
         self.velocity = math.fabs(PlayerConstants.PLAYER_VELOCITY)
         # actual player pos goes by the platform he is on
@@ -33,14 +29,13 @@ class Player:
 
         self.radius_change = 0
 
-
-
     """
         Function calculates current position change with respect to the mouse (follower)
         and current velocity
         The player doesn't actually move, because of that the position should be with respect to actual screen coords
         But when taking into account the mouse, the change in the position should be with respect to the playerCamera
     """
+
     def move(self):
         dx, dy = pygame.mouse.get_pos()
         # Magnitude of velocity with direction of mouse
@@ -70,20 +65,22 @@ class Player:
     """
         Runs periodically, HAS to be called by the game handler
     """
+
     def execute(self, drawColor, surface, coordinate_helper):
         self.move()
-        #print(f"Player pos: {self.x},{self.y}" )
+        # print(f"Player pos: {self.x},{self.y}" )
         self.draw(drawColor, surface, coordinate_helper)
-
 
     """
         Increases size by area of edible, returns radius change
     """
+
     def eat(self):
         old_radius = self.radius
-        self.radius = ((math.pi * self.radius**2 + math.pi * EdibleConstants.EDIBLE_RADIUS**2) / math.pi)**0.5
-        old_area = old_radius**2*math.pi
-        area = self.radius**2*math.pi
+        self.radius = ((math.pi * self.radius ** 2 + math.pi * EdibleConstants.EDIBLE_RADIUS ** 2) / math.pi) ** 0.5
+        old_area = old_radius ** 2 * math.pi
+        area = self.radius ** 2 * math.pi
         return self.radius - old_radius
+
     def get_position(self):
         return self.x, self.y
