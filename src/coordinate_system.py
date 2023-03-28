@@ -29,10 +29,6 @@ class CoordinateSystemHelper:
 
     def platform_to_screen_radius(self, platform_radius):
         width_ratio = 1 / (self.player_camera.width / PlayerCameraConstants.SCREEN_WIDTH)
-        platform_area = math.pi * platform_radius**2
-        screen_area = platform_area * width_ratio
-        screen_radius = (screen_area/math.pi)**0.5
-        return screen_radius
-
+        return platform_radius * width_ratio
     def platform_to_screen(self, platform_pos, platform_radius):
         return (self.platform_to_screen_coordinates(platform_pos)), self.platform_to_screen_radius(platform_radius)
