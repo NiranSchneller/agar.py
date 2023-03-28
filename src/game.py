@@ -4,7 +4,6 @@ from constants import *
 from player import Player
 from player_camera import PlayerCamera
 from edible import Edible
-from coordinate_system import CoordinateSystemHelper
 import random
 pygame.init()
 score = 0
@@ -33,9 +32,11 @@ def update_edibles(player, player_camera, edibles):
         if edible.should_be_eaten(player.get_position(), player.radius):
             score += 1
             edible.print_distance(player.get_position(), player.radius)
-            player_camera.edible_eaten(player.radius / PlayerConstants.PLAYER_STARTING_RADIUS,
-                                       player.radius / PlayerConstants.PLAYER_STARTING_RADIUS)
+            scale = (player.radius) / (PlayerConstants.PLAYER_STARTING_RADIUS)
+            player_camera.edible_eaten(scale,
+                                       scale)
             player.eat()
+
             edibles.remove(edible)
             edibles.append(generate_random_edible())
 
@@ -43,6 +44,7 @@ def update_edibles(player, player_camera, edibles):
 """
     Random distribution of edibles across the map
 """
+
 def init_edibles():
     edibles = []
 

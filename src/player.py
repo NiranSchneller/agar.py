@@ -1,6 +1,6 @@
 import math
 from constants import *
-
+from interpolator import Interpolator
 
 """
     Function derived from x**2
@@ -31,6 +31,8 @@ class Player:
         self.y = PlatformConstants.PLATFORM_HEIGHT / 2
         self.radius = PlayerConstants.PLAYER_STARTING_RADIUS
 
+        self.radius_change = 0
+
 
 
     """
@@ -58,8 +60,11 @@ class Player:
 
     def draw(self, color, surface, coordinate_helper):
         screen_radius = coordinate_helper.platform_to_screen_radius(self.radius)
-        pygame.draw.circle(surface, color, PlayerConstants.PLAYER_LOCATION_CAMERA, PlayerConstants.PLAYER_STARTING_RADIUS)
-        pygame.draw.circle(surface, PlayerConstants.PLAYER_OUTLINE_COLOR, PlayerConstants.PLAYER_LOCATION_CAMERA, PlayerConstants.PLAYER_STARTING_RADIUS,
+        screen_x, screen_y = coordinate_helper.platform_to_screen_coordinates(self.get_position())
+        print(f"Radius: {screen_radius}")
+        pygame.draw.circle(surface, color, (screen_x, screen_y), PlayerConstants.PLAYER_STARTING_RADIUS)
+        pygame.draw.circle(surface, PlayerConstants.PLAYER_OUTLINE_COLOR, (screen_x, screen_y),
+                           PlayerConstants.PLAYER_STARTING_RADIUS,
                            PlayerConstants.PLAYER_STARTING_OUTLINE_THICKNESS)
 
     """
@@ -76,7 +81,9 @@ class Player:
     """
     def eat(self):
         old_radius = self.radius
-        self.radius = (((math.pi * self.radius**2 + math.pi * EdibleConstants.EDIBLE_RADIUS**2) / math.pi)**0.5)
+        self.radius = ((math.pi * self.radius**2 + math.pi * EdibleConstants.EDIBLE_RADIUS**2) / math.pi)**0.5
+        old_area = old_radius**2*math.pi
+        area = self.radius**2*math.pi
         return self.radius - old_radius
     def get_position(self):
         return self.x, self.y
