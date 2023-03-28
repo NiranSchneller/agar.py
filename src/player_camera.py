@@ -9,9 +9,8 @@ from coordinate_system import CoordinateSystemHelper
 
 
 class PlayerCamera:
-    def __init__(self):
-        self.window = pygame.display.set_mode((PlayerCameraConstants.SCREEN_WIDTH,
-                                               PlayerCameraConstants.SCREEN_HEIGHT))
+    def __init__(self, window):
+        self.window = window
         pygame.display.set_caption(GameSettings.GAME_NAME)
         self.x = 0
         self.y = 0
