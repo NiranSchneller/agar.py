@@ -1,4 +1,4 @@
-from constants import *
+from src.constants import *
 import math
 
 """
@@ -16,8 +16,8 @@ def get_distance(pos1, pos2):
 
 """
 class Edible:
-    def __init__(self, x, y, color):
-        self.radius = EdibleConstants.EDIBLE_RADIUS
+    def __init__(self, x, y, color, radius = EdibleConstants.EDIBLE_RADIUS):
+        self.radius = radius
         self.platform_x = x
         self.platform_y = y
         self.color = color

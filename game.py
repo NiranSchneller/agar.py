@@ -1,5 +1,6 @@
-import networking.client as client
-import networking.server as server
+import src.networking.client as client
+import src.networking.server as server
+
 """
     Runs main.
 """

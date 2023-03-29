@@ -1,6 +1,6 @@
-from constants import *
-from interpolator import Interpolator
-from coordinate_system import CoordinateSystemHelper
+from src.constants import *
+from src.interpolator import Interpolator
+from src.coordinate_system import CoordinateSystemHelper
 """
     This class represents the player camera.
     It manages every 'Drawable', including the functionality of making the camera bigger and smaller.

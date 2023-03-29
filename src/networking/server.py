@@ -1,10 +1,12 @@
-import random
 import threading
 
 from src.constants import EdibleConstants, PlatformConstants
-from src.edible import Edible
 from src.world import  World
 import socket
+from src.networking.helpers.utils import send_with_size
+from src.networking.helpers.game_protocol import Protocol
+
+world = None
 
 class Server:
     """
@@ -23,8 +25,11 @@ class Server:
         self.amount_of_clients = 0
 
     def __handle_client(self, client_socket, address):
-        while True:
-            print("nice")
+        message = Protocol.server_initiate_world((world.width, world.height), world.edibles)
+        send_with_size(client_socket, message)
+
+
+
 
     """
         Accepts a new client (blocking)
@@ -38,11 +43,11 @@ class Server:
         self.amount_of_clients += 1
 
 def start():
-
-    server = Server(2)
-
+    global world
     world = World(PlatformConstants.PLATFORM_WIDTH, PlatformConstants.PLATFORM_HEIGHT)
     world.spawn_edibles(EdibleConstants.AMOUNT_OF_EDIBLES)
+
+    server = Server(2)
 
     while True:
         # wait for new clients.

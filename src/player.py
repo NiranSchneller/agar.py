@@ -1,6 +1,6 @@
 import math
-from constants import *
-from interpolator import Interpolator
+from src.constants import *
+from src.interpolator import Interpolator
 
 """
     Returns Euclidean distance between two points
@@ -55,7 +55,6 @@ class Player:
     def draw(self, color, surface, coordinate_helper):
         screen_radius = coordinate_helper.platform_to_screen_radius(self.radius)
         screen_x, screen_y = coordinate_helper.platform_to_screen_coordinates(self.get_position())
-        print(f"Radius: {screen_radius}")
         pygame.draw.circle(surface, color, (screen_x, screen_y), screen_radius)
         pygame.draw.circle(surface, PlayerConstants.PLAYER_OUTLINE_COLOR, (screen_x, screen_y),
                            screen_radius,

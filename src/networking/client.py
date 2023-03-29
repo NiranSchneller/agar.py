@@ -1,22 +1,29 @@
 import random
 import socket
+import sys
 import threading
 
 import pygame
 
-from src.constants import GameSettings, PlayerCameraConstants, PlayerConstants, EdibleConstants, PlatformConstants
+from src.constants import GameSettings, PlayerConstants, EdibleConstants, PlatformConstants
+from src.networking.helpers import game_protocol
 from src.edible import Edible
 from src.player import Player
 from src.player_camera import PlayerCamera
+
+from src.networking.helpers.utils import recv_by_size, send_with_size
 
 window = None
 pygame.init()
 score = 0
 FONT = pygame.font.SysFont('arial', 40)
 
+
 class WorldInformation:
 
     def __init__(self):
+        self.width = 0
+        self.height = 0
         self.edibles = []
         self.players = []
 
@@ -25,7 +32,7 @@ class WorldInformation:
 
 
 class Client:
-    def __init__(self, host, port):
+    def __init__(self, host, port, world_information: WorldInformation):
         self.socket = socket.socket()
         self.thread = None
         try:
@@ -33,17 +40,25 @@ class Client:
             print("Connected")
         except:
             print("Connection error, please check ip or port!")
-
+            sys.exit()
+        self.world_information = world_information
 
     """
         Starts recieving and sending messages, opens a seperate thread
     """
+
     def start_client(self):
+        message = recv_by_size(self.socket)
+        world_size, edibles = game_protocol.Protocol.parse_server_initiate_world(message)
+        self.world_information.initiate_edibles(edibles)
+        self.world_information.width, self.world_information.height = world_size
+
         self.thread = threading.Thread(target=self.__handle_connection, args=())
+        self.thread.start()
 
     def __handle_connection(self):
-        pass
-
+        while True:
+            send_with_size(self.socket, 'OK')
 
 
 # Game Variables
@@ -60,6 +75,7 @@ def update_window(player, player_camera, edibles):
 def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
     window.blit(img, (x, y))
+
 
 def update_score():
     global score
@@ -88,6 +104,7 @@ def update_edibles(player, player_camera, edibles):
     Random distribution of edibles across the map
 """
 
+
 def init_edibles():
     edibles = []
 
@@ -101,6 +118,7 @@ def generate_random_edible():
     return Edible(random.randint(radius, PlatformConstants.PLATFORM_WIDTH - radius),
                   random.randint(radius, PlatformConstants.PLATFORM_HEIGHT - radius), EdibleConstants.EDIBLE_COLOR)
 
+
 def start(width, height):
     running = True
 
@@ -109,10 +127,11 @@ def start(width, height):
 
     player = Player("Niran")
     player_camera = PlayerCamera(window)
+    world_information = WorldInformation()
 
-    client = Client("192.168.1.29", 34197)
-
-    edibles = init_edibles()
+    client = Client("192.168.1.29", 34197, world_information)
+    client.start_client()
+    edibles = world_information.edibles
 
     clock = pygame.time.Clock()
 
