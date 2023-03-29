@@ -41,7 +41,6 @@ class PlayerCamera:
         
     """
     def edible_eaten(self, width_scalar, height_scalar):
-        print(f'{width_scalar},{height_scalar}')
         self.width_interpolator.init_lerp(self.width, PlayerCameraConstants.SCREEN_WIDTH * width_scalar)
         self.height_interpolator.init_lerp(self.height, PlayerCameraConstants.SCREEN_HEIGHT * height_scalar)
 
