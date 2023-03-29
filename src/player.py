@@ -27,7 +27,6 @@ class Player:
         self.y = PlatformConstants.PLATFORM_HEIGHT / 2
         self.radius = PlayerConstants.PLAYER_STARTING_RADIUS
 
-        self.radius_change = 0
 
     """
         Function calculates current position change with respect to the mouse (follower)
