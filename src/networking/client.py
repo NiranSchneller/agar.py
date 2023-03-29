@@ -178,6 +178,7 @@ def start(width, height):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                # TODO: terminate the client server connection
 
         update_window(player, player_camera, world_information.edibles, client)
         clock.tick(GameSettings.FPS)

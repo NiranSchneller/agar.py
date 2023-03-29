@@ -1,7 +1,7 @@
 from src.edible import Edible
 from ast import literal_eval as make_tuple
 from src.networking.information.player_information import PlayerInformation
-LOG_PROTOCOL = False
+LOG_PROTOCOL = True
 
 class Protocol:
     """
