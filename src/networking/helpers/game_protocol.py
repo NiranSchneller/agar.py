@@ -155,14 +155,14 @@ class Protocol:
         except:
             print(message)
         player_information_list = player_information_unparsed.split('~')
-
+        print(player_information_list)
         player_information_parsed : [PlayerInformation] = []
         for information in player_information_list:
             if information != '':
                 information_params = information.split(',')
                 player_name = information_params[0]
                 player_x, player_y = int(float(information_params[1])), int(float(information_params[2]))
-                player_radius = information_params[3]
+                player_radius = int(float(information_params[3]))
                 player_information_parsed.append(PlayerInformation(player_x,player_y,player_radius,player_name))
 
 

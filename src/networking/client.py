@@ -92,6 +92,7 @@ class Client:
 
             self.world_information.remove_edibles(edibles_removed)
             self.world_information.add_edibles(edibles_created)
+            self.world_information.set_players(other_players)
 
 
 
@@ -125,12 +126,14 @@ def update_window(player, player_camera, edibles, client: Client, other_player_i
 
 def draw_other_players(other_player_information : [PlayerInformation], coords):
     for player_information in other_player_information:
+        print("drawing")
         draw_other_player(player_information.x, player_information.y, player_information.radius, PlayerConstants.PLAYER_COLOR, coords)
 
 def draw_other_player(x, y, radius, color, coordinate_helper):
     screen_radius = coordinate_helper.platform_to_screen_radius(radius)
     screen_x, screen_y = coordinate_helper.platform_to_screen_coordinates((x, y))
-
+    print(screen_radius)
+    print(screen_x)
     pygame.draw.circle(window, color, (screen_x, screen_y), screen_radius)
     pygame.draw.circle(window, PlayerConstants.PLAYER_OUTLINE_COLOR, (screen_x, screen_y),
                        screen_radius,
