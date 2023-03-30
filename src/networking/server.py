@@ -44,11 +44,18 @@ class Server:
             new_edibles = []
             for edible in edibles_eaten:
                 new_edibles.append(world.delete_edible(edible))
+
+            if new_edibles:
+                print(f"New edibles: {new_edibles}")
+            if edibles_eaten:
+                print(f"Edibles eaten: {edibles_eaten}")
             self.edible_update_handler.notify_threads_changing_edible_status(new_edibles, edibles_eaten, thread_id)
             self.player_update_handler.update_player(player_information)
             other_player_information = self.player_update_handler.get_players(player_information)
 
             edibles_removed, new_edibles_other = self.edible_update_handler.fetch_thread_specific_edible_updates(thread_id)
+            if new_edibles_other:
+                print(f"{new_edibles_other}")
             new_edibles = new_edibles + new_edibles_other
             send_with_size(client_socket, Protocol.generate_server_status_update(new_edibles, other_player_information, edibles_removed))
     """

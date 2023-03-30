@@ -155,7 +155,6 @@ class Protocol:
         except:
             print(message)
         player_information_list = player_information_unparsed.split('~')
-        print(player_information_list)
         player_information_parsed : [PlayerInformation] = []
         for information in player_information_list:
             if information != '':

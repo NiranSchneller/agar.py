@@ -26,12 +26,12 @@ class ThreadUpdateHelper:
         To be used by the thread, will clear the list
     """
     def fetch_edibles_removed(self):
-        edibles_removed = self.edibles_removed
+        edibles_removed = self.edibles_removed.copy()
         self.edibles_removed.clear()
         return edibles_removed
 
 
     def fetch_edibles_created(self):
-        edibles_created = self.edibles_created
+        edibles_created = self.edibles_created.copy()
         self.edibles_created.clear()
         return edibles_created
