@@ -132,12 +132,12 @@ def draw_other_players(other_player_information : [PlayerInformation], coords):
 def draw_other_player(x, y, radius, color, coordinate_helper):
     screen_radius = coordinate_helper.platform_to_screen_radius(radius)
     screen_x, screen_y = coordinate_helper.platform_to_screen_coordinates((x, y))
-    print(screen_radius)
-    print(screen_x)
-    pygame.draw.circle(window, color, (screen_x, screen_y), screen_radius)
-    pygame.draw.circle(window, PlayerConstants.PLAYER_OUTLINE_COLOR, (screen_x, screen_y),
-                       screen_radius,
-                       PlayerConstants.PLAYER_STARTING_OUTLINE_THICKNESS)
+
+    if not screen_x < 0:
+        pygame.draw.circle(window, color, (screen_x, screen_y), screen_radius)
+        pygame.draw.circle(window, PlayerConstants.PLAYER_OUTLINE_COLOR, (screen_x, screen_y),
+                           screen_radius,
+                           PlayerConstants.PLAYER_STARTING_OUTLINE_THICKNESS)
 
 
 
@@ -166,26 +166,6 @@ def update_edibles(player, player_camera, edibles, client):
                                        scale)
             player.eat()
             edibles.remove(edible)
-            edibles.append(generate_random_edible())
-
-
-"""
-    Random distribution of edibles across the map
-"""
-
-
-def init_edibles():
-    edibles = []
-
-    for i in range(EdibleConstants.AMOUNT_OF_EDIBLES):
-        edibles.append(generate_random_edible())
-    return edibles
-
-
-def generate_random_edible():
-    radius = EdibleConstants.EDIBLE_RADIUS
-    return Edible(random.randint(radius, PlatformConstants.PLATFORM_WIDTH - radius),
-                  random.randint(radius, PlatformConstants.PLATFORM_HEIGHT - radius), EdibleConstants.EDIBLE_COLOR)
 
 
 def start(width, height, name):
