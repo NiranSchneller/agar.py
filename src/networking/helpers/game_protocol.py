@@ -1,7 +1,7 @@
 from src.edible import Edible
 from ast import literal_eval as make_tuple
 from src.networking.information.player_information import PlayerInformation
-LOG_PROTOCOL = True
+LOG_PROTOCOL = False
 
 class Protocol:
     """
@@ -68,8 +68,6 @@ class Protocol:
         message = '~'
         message += f'{name},{player_x},{player_y},{player_radius}~'
 
-
-
         if edibles is not None:
             for edible in edibles:
                 tup = str(edible.color).replace(',', ':')
@@ -94,7 +92,6 @@ class Protocol:
         player_location = player_information[1], player_information[2]
         player_radius  = player_information[3]
 
-
         eaten_edibles = []
         # update the server if any edibles were eaten
         if message_list[2] != '':
@@ -108,8 +105,7 @@ class Protocol:
                     color = make_tuple(params[2].replace(':', ','))
                     radius = int(params[3])
                     eaten_edibles.append(Edible(edible_x, edible_y, color, radius))
-
-        return PlayerInformation(player_name, player_location[0], player_location[1], player_radius), eaten_edibles
+        return PlayerInformation(player_location[0], player_location[1], player_radius, player_name), eaten_edibles
 
 
 
@@ -120,21 +116,27 @@ class Protocol:
         message -> [size]~5,5,(2,2,2),6~...~!"#6,5,4...~23,45,(..),5~!"....~
     """
     @staticmethod
-    def generate_server_status_update(edibles_created: [Edible], player_locations, edibles_removed: [Edible]):
+    def generate_server_status_update(edibles_created: [Edible], other_player_information : [PlayerInformation], edibles_removed: [Edible]):
 
         message = f'~'
 
         for edible in edibles_created:
             tup = str(edible.color).replace(',', ':')
             message += f'{edible.platform_x},{edible.platform_y},{tup},{edible.radius}~'
+        # added edibles created
+        message += '!"#'
+        for player_information in other_player_information:
+            message += f'{player_information.name},{player_information.x},{player_information.y},{player_information.radius}~'
+        message += '!"#'
 
-        # TODO: player_locations and edibles_removed
-        return message + '!"#' # TEMPORARY
+        for edible_removed in edibles_removed:
+            tup = str(edible_removed.color).replace(',', ':')
+            message += f'{edible_removed.platform_x},{edible_removed.platform_y},{tup},{edible_removed.radius}~'
+        return message
 
 
     @staticmethod
     def parse_server_status_update(message: str):
-        # TODO: transition between data
         edibles_created_unparsed = message.split('!"#')[0]
         # now we have: ~5,5,(2,2,2),6~...~
         edibles_created_list = edibles_created_unparsed.split('~')
@@ -148,7 +150,36 @@ class Protocol:
                 color = make_tuple(params[2].replace(':', ','))
                 radius = int(params[3])
                 edibles_created.append(Edible(edible_x, edible_y, color, radius))
-        return edibles_created
+        try:
+            player_information_unparsed = message.split('!"#')[1]
+        except:
+            print(message)
+        player_information_list = player_information_unparsed.split('~')
+
+        player_information_parsed : [PlayerInformation] = []
+        for information in player_information_list:
+            if information != '':
+                information_params = information.split(',')
+                player_name = information_params[0]
+                player_x, player_y = int(float(information_params[1])), int(float(information_params[2]))
+                player_radius = information_params[3]
+                player_information_parsed.append(PlayerInformation(player_x,player_y,player_radius,player_name))
+
+
+        edibles_removed_list = message.split('!"#')[2].split('~')
+
+        edibles_removed : [Edible] = []
+
+        for edible_removed in edibles_removed_list:
+            if edible_removed != '':
+                params = edible_removed.split(',')
+                edible_x = int(params[0])
+                edible_y = int(params[1])
+                color = make_tuple(params[2].replace(':', ','))
+                radius = int(params[3])
+                edibles_removed.append(Edible(edible_x, edible_y, color, radius))
+
+        return edibles_created, player_information_parsed, edibles_removed
 
 
 

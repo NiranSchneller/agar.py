@@ -6,6 +6,6 @@ import src.networking.server as server
 """
 if __name__ == '__main__':
     if input("Enter client/server:") == 'client':
-        client.start(1920, 1080)
+        client.start(1920, 1080, input("enter name bruh"))
     else:
         server.start()

@@ -13,3 +13,9 @@ class PlayerInformation:
         self.x = x
         self.y = y
         self.radius = radius
+
+    def __str__(self):
+        return f'name:{self.name},x:{self.x},y:{self.y},radius:{self.radius}'
+
+    def __repr__(self):
+        return f'name:{self.name},x:{self.x},y:{self.y},radius:{self.radius}'

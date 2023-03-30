@@ -26,7 +26,7 @@ class WorldInformation:
         self.width = 0
         self.height = 0
         self.edibles = []
-        self.players = []
+        self.players : [PlayerInformation] = []
 
     def initiate_edibles(self, edibles: [Edible]):
         self.edibles = edibles
@@ -37,6 +37,13 @@ class WorldInformation:
     def add_edibles(self, edibles: [Edible]):
         for edible in edibles:
             self.__add_edible(edible)
+
+    def remove_edibles(self, edibles_removed):
+        for edible in edibles_removed:
+            self.edibles.remove(edible)
+
+    def set_players(self, other_players):
+        self.players = other_players
 
 class Client:
     def __init__(self, host, port, world_information: WorldInformation, player_information: PlayerInformation):
@@ -52,7 +59,7 @@ class Client:
         # To Handle sending data
         self.world_information = world_information
         self.player_information = player_information
-        self.edible_update_list = list()
+        self.edible_eaten_list = list()
 
     """
         Starts recieving and sending messages, opens a seperate thread
@@ -76,13 +83,17 @@ class Client:
             message = Protocol.generate_client_status_update(self.player_information.x, self.player_information.y,
                                                              self.player_information.radius,
                                                              self.player_information.name,
-                                                             self.edible_update_list.copy())
-            self.edible_update_list.clear()
+                                                             self.edible_eaten_list.copy())
+            self.edible_eaten_list.clear()
 
             send_with_size(self.socket, message)  # update the server on relevant information
             server_reply = recv_by_size(self.socket)
-            edibles_created = Protocol.parse_server_status_update(server_reply)
+            edibles_created, other_players, edibles_removed = Protocol.parse_server_status_update(server_reply)
+
+            self.world_information.remove_edibles(edibles_removed)
             self.world_information.add_edibles(edibles_created)
+
+
 
 
     """
@@ -90,7 +101,7 @@ class Client:
     """
 
     def notify_eaten_edible(self, edible: Edible):
-        self.edible_update_list.append(edible)
+        self.edible_eaten_list.append(edible)
 
     """
         This information is sent to the server to update location
@@ -102,13 +113,29 @@ class Client:
         self.player_information.radius = radius
 
 
-def update_window(player, player_camera, edibles, client: Client):
+def update_window(player, player_camera, edibles, client: Client, other_player_information):
     player_camera.update_window(player.get_position())
     update_edibles(player, player_camera, edibles, client)
+    draw_other_players(other_player_information, player_camera.coordinate_helper)
     player.execute(PlayerConstants.PLAYER_COLOR, window, player_camera.coordinate_helper)
     update_score()
     client.update_player_information(player.x, player.y, player.radius)
     pygame.display.flip()
+
+
+def draw_other_players(other_player_information : [PlayerInformation], coords):
+    for player_information in other_player_information:
+        draw_other_player(player_information.x, player_information.y, player_information.radius, PlayerConstants.PLAYER_COLOR, coords)
+
+def draw_other_player(x, y, radius, color, coordinate_helper):
+    screen_radius = coordinate_helper.platform_to_screen_radius(radius)
+    screen_x, screen_y = coordinate_helper.platform_to_screen_coordinates((x, y))
+
+    pygame.draw.circle(window, color, (screen_x, screen_y), screen_radius)
+    pygame.draw.circle(window, PlayerConstants.PLAYER_OUTLINE_COLOR, (screen_x, screen_y),
+                       screen_radius,
+                       PlayerConstants.PLAYER_STARTING_OUTLINE_THICKNESS)
+
 
 
 def draw_text(text, font, text_col, x, y):
@@ -158,13 +185,13 @@ def generate_random_edible():
                   random.randint(radius, PlatformConstants.PLATFORM_HEIGHT - radius), EdibleConstants.EDIBLE_COLOR)
 
 
-def start(width, height):
+def start(width, height, name):
     running = True
 
     global window
     window = pygame.display.set_mode((width, height))
 
-    player = Player("Niran")
+    player = Player(name)
     player_camera = PlayerCamera(window)
     world_information = WorldInformation()
     player_information = PlayerInformation(player.x, player.y, player.radius, player.name)
@@ -180,6 +207,6 @@ def start(width, height):
                 running = False
                 # TODO: terminate the client server connection
 
-        update_window(player, player_camera, world_information.edibles, client)
+        update_window(player, player_camera, world_information.edibles, client, world_information.players)
         clock.tick(GameSettings.FPS)
     pygame.quit()
