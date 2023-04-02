@@ -14,8 +14,5 @@ class PlayerInformation:
         self.y = y
         self.radius = radius
 
-    def __str__(self):
-        return f'name:{self.name},x:{self.x},y:{self.y},radius:{self.radius}'
-
-    def __repr__(self):
-        return f'name:{self.name},x:{self.x},y:{self.y},radius:{self.radius}'
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y and self.radius == other.radius and self.name == other.name

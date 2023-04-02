@@ -1,3 +1,4 @@
+import math
 import random
 import socket
 import sys
@@ -18,8 +19,9 @@ window = None
 pygame.init()
 score = 0
 FONT = pygame.font.SysFont('arial', 40)
-
-
+running = True
+player : Player = None
+player_camera : PlayerCamera = None
 class WorldInformation:
 
     def __init__(self):
@@ -79,7 +81,8 @@ class Client:
         Main client func, communicates with the server and updates the server on relevant information
     """
     def __handle_connection(self):
-        while True:
+        global running
+        while running:
             message = Protocol.generate_client_status_update(self.player_information.x, self.player_information.y,
                                                              self.player_information.radius,
                                                              self.player_information.name,
@@ -88,11 +91,23 @@ class Client:
 
             send_with_size(self.socket, message)  # update the server on relevant information
             server_reply = recv_by_size(self.socket)
-            edibles_created, other_players, edibles_removed = Protocol.parse_server_status_update(server_reply)
+
+            if Protocol.parse_server_status_update(server_reply) == "EATEN":
+                running = False
+                print("bye")
+                break
+
+            edibles_created, other_players, edibles_removed, ate_inc = Protocol.parse_server_status_update(server_reply)
 
             self.world_information.remove_edibles(edibles_removed)
             self.world_information.add_edibles(edibles_created)
             self.world_information.set_players(other_players)
+
+            global player
+            player.radius += ate_inc
+            player_camera.edible_eaten(player.radius / PlayerConstants.PLAYER_STARTING_RADIUS,
+                                       player.radius / PlayerConstants.PLAYER_STARTING_RADIUS)
+
 
 
 
@@ -114,6 +129,8 @@ class Client:
         self.player_information.radius = radius
 
 
+
+
 def update_window(player, player_camera, edibles, client: Client, other_player_information):
     player_camera.update_window(player.get_position())
     update_edibles(player, player_camera, edibles, client)
@@ -126,7 +143,6 @@ def update_window(player, player_camera, edibles, client: Client, other_player_i
 
 def draw_other_players(other_player_information : [PlayerInformation], coords):
     for player_information in other_player_information:
-        print("drawing")
         draw_other_player(player_information.x, player_information.y, player_information.radius, PlayerConstants.PLAYER_COLOR, coords)
 
 def draw_other_player(x, y, radius, color, coordinate_helper):
@@ -169,11 +185,12 @@ def update_edibles(player, player_camera, edibles, client):
 
 
 def start(width, height, name):
-    running = True
 
     global window
     window = pygame.display.set_mode((width, height))
 
+    global player
+    global player_camera
     player = Player(name)
     player_camera = PlayerCamera(window)
     world_information = WorldInformation()
@@ -183,13 +200,12 @@ def start(width, height, name):
     client.start_client()
 
     clock = pygame.time.Clock()
-
+    global running
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 # TODO: terminate the client server connection
-
         update_window(player, player_camera, world_information.edibles, client, world_information.players)
         clock.tick(GameSettings.FPS)
     pygame.quit()
