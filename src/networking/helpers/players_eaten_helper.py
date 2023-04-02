@@ -20,3 +20,4 @@ class PlayersEatenHelper:
 
     def get_eaten_status(self, thread_id):
         return self.handler_list[thread_id]
+

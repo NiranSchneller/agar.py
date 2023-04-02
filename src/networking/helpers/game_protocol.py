@@ -2,7 +2,7 @@ from src.edible import Edible
 from ast import literal_eval as make_tuple
 from src.networking.information.player_information import PlayerInformation
 LOG_PROTOCOL = False
-
+EATEN = "EATEN"
 class Protocol:
     """
         This method constructs a message that is to be sent to the client, requires information about the players
@@ -116,7 +116,9 @@ class Protocol:
         message -> [size]~5,5,(2,2,2),6~...~!"#6,5,4...~23,45,(..),5~!"....~
     """
     @staticmethod
-    def generate_server_status_update(edibles_created: [Edible], other_player_information : [PlayerInformation], edibles_removed: [Edible]):
+    def generate_server_status_update(edibles_created: [Edible], other_player_information : [PlayerInformation], edibles_removed: [Edible], eaten_rad_increase, is_eaten):
+        if is_eaten:
+            return EATEN
 
         message = f'~'
 
@@ -132,11 +134,16 @@ class Protocol:
         for edible_removed in edibles_removed:
             tup = str(edible_removed.color).replace(',', ':')
             message += f'{edible_removed.platform_x},{edible_removed.platform_y},{tup},{edible_removed.radius}~'
-        return message
+
+
+        return message + '!"#' + str(eaten_rad_increase)
 
 
     @staticmethod
     def parse_server_status_update(message: str):
+        if message is "EATEN":
+            return "EATEN"
+
         edibles_created_unparsed = message.split('!"#')[0]
         # now we have: ~5,5,(2,2,2),6~...~
         edibles_created_list = edibles_created_unparsed.split('~')
@@ -178,7 +185,10 @@ class Protocol:
                 radius = int(params[3])
                 edibles_removed.append(Edible(edible_x, edible_y, color, radius))
 
-        return edibles_created, player_information_parsed, edibles_removed
+
+        radius_inc = float(message.split('!"#')[2])
+
+        return edibles_created, player_information_parsed, edibles_removed, radius_inc
 
 
 
