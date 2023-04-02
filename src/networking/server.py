@@ -8,9 +8,9 @@ from src.world import  World
 import socket
 from src.networking.helpers.utils import send_with_size, recv_by_size
 from src.networking.helpers.game_protocol import Protocol
-
+from threading import Lock
 world : World = None
-
+lock = Lock()
 class Server:
     """
         TCP Connection
@@ -49,11 +49,13 @@ class Server:
                 print(f"New edibles: {new_edibles}")
             if edibles_eaten:
                 print(f"Edibles eaten: {edibles_eaten}")
+
+            lock.acquire()
             self.edible_update_handler.notify_threads_changing_edible_status(new_edibles, edibles_eaten, thread_id)
             self.player_update_handler.update_player(player_information)
             other_player_information = self.player_update_handler.get_players(player_information)
-
             edibles_removed, new_edibles_other = self.edible_update_handler.fetch_thread_specific_edible_updates(thread_id)
+            lock.release()
             if new_edibles_other:
                 print(f"{new_edibles_other}")
             new_edibles = new_edibles + new_edibles_other
