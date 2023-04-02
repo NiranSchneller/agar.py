@@ -21,6 +21,7 @@ score = 0
 FONT = pygame.font.SysFont('arial', 40)
 running = True
 player : Player = None
+player_camera : PlayerCamera = None
 class WorldInformation:
 
     def __init__(self):
@@ -104,6 +105,9 @@ class Client:
 
             global player
             player.radius += ate_inc
+            player_camera.edible_eaten(player.radius / PlayerConstants.PLAYER_STARTING_RADIUS,
+                                       player.radius / PlayerConstants.PLAYER_STARTING_RADIUS)
+
 
 
 
@@ -186,6 +190,7 @@ def start(width, height, name):
     window = pygame.display.set_mode((width, height))
 
     global player
+    global player_camera
     player = Player(name)
     player_camera = PlayerCamera(window)
     world_information = WorldInformation()
