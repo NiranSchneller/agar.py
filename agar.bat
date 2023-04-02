@@ -1,3 +1,3 @@
 @ECHO %CD%
-python game.py
+python agar.py
 pause
