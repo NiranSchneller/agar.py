@@ -18,5 +18,7 @@ class PlayerUpdateHandler:
         
         If nothing in dict returns -> []
     """
-    def get_players(self, player_information : PlayerInformation):
+    def get_players(self, player_information : PlayerInformation = None):
+        if player_information is None:
+            return self.players_dict.items()
         return [v for k, v in self.players_dict.items() if k != player_information.name]

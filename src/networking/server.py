@@ -1,6 +1,7 @@
 import threading
 
 from src.constants import EdibleConstants, PlatformConstants
+from src.networking.handlers.collision_detector import CollisionDetector
 from src.networking.handlers.player_update_handler import PlayerUpdateHandler
 from src.networking.handlers.edible_update_handler import EdibleUpdateHandler
 
@@ -11,6 +12,12 @@ from src.networking.helpers.game_protocol import Protocol
 from threading import Lock
 world : World = None
 lock = Lock()
+
+
+def collision_exists(player1, player2):
+    dist = ((player1.x - player2.x)**2 + (player1.y - player2.y)**2)**0.5
+    return dist < max(player1.radius, player2.radius)
+
 class Server:
     """
         TCP Connection
@@ -24,9 +31,14 @@ class Server:
         self.socket.listen(max_waiting)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.threads = []
+        self.collision_detector = CollisionDetector()
+        self.collision_detector_thread = threading.Thread(target=self.__handle_collisions, args=())
+        self.collision_detector_thread.start()
 
         self.player_update_handler = PlayerUpdateHandler()
         self.edible_update_handler = EdibleUpdateHandler()
+
+        self.player_thread = dict()
 
         self.amount_of_clients = 0
 
@@ -40,6 +52,7 @@ class Server:
             message = recv_by_size(client_socket) # recieve update
             player_information, edibles_eaten = Protocol.parse_client_status_update(message)
 
+            self.player_thread[player_information.name] = thread_id # for collision detection
 
             new_edibles = []
             for edible in edibles_eaten:
@@ -60,6 +73,24 @@ class Server:
                 print(f"{new_edibles_other}")
             new_edibles = new_edibles + new_edibles_other
             send_with_size(client_socket, Protocol.generate_server_status_update(new_edibles, other_player_information, edibles_removed))
+
+    def __handle_collisions(self):
+        while True:
+            lock.acquire()
+            collisions = self.__detect_collisions(self.player_update_handler.get_players())
+            lock.release()
+            for collision in collisions:
+                pass # to be continued
+
+    def __detect_collisions(self, players):
+        collisions = []
+        for player_information in players:
+            for collision_search in players:
+                if player_information.name != collision_search.name and collision_exists(player_information,
+                                                                                         collision_search):
+                    collisions.append((player_information, collision_search))
+        return collisions
+
     """
         Accepts a new client (blocking)
     """
