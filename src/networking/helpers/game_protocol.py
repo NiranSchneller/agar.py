@@ -89,8 +89,8 @@ class Protocol:
         # location of player in world coordinates
         player_information = message_list[1].split(',')
         player_name = player_information[0]
-        player_location = player_information[1], player_information[2]
-        player_radius  = player_information[3]
+        player_location = float(player_information[1]), float(player_information[2])
+        player_radius  = float(player_information[3])
 
         eaten_edibles = []
         # update the server if any edibles were eaten
@@ -141,13 +141,12 @@ class Protocol:
 
     @staticmethod
     def parse_server_status_update(message: str):
-        if message is "EATEN":
+        if message.strip() == "EATEN":
             return "EATEN"
 
         edibles_created_unparsed = message.split('!"#')[0]
         # now we have: ~5,5,(2,2,2),6~...~
         edibles_created_list = edibles_created_unparsed.split('~')
-
         edibles_created = []
         for edible_created in edibles_created_list:
             if edible_created != '':
@@ -157,10 +156,7 @@ class Protocol:
                 color = make_tuple(params[2].replace(':', ','))
                 radius = int(params[3])
                 edibles_created.append(Edible(edible_x, edible_y, color, radius))
-        try:
-            player_information_unparsed = message.split('!"#')[1]
-        except:
-            print(message)
+        player_information_unparsed = message.split('!"#')[1]
         player_information_list = player_information_unparsed.split('~')
         player_information_parsed : [PlayerInformation] = []
         for information in player_information_list:
@@ -185,9 +181,8 @@ class Protocol:
                 radius = int(params[3])
                 edibles_removed.append(Edible(edible_x, edible_y, color, radius))
 
-
-        radius_inc = float(message.split('!"#')[2])
-
+        radius_inc = (message.split('!"#')[3])
+        radius_inc = float(radius_inc)
         return edibles_created, player_information_parsed, edibles_removed, radius_inc
 
 

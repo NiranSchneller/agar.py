@@ -21,8 +21,8 @@ class PlayerUpdateHandler:
 
     def get_players(self, player_information: PlayerInformation = None):
         if player_information is None:
-            return self.players_dict.values()
-        return [v for k, v in self.players_dict.items() if k != player_information.name and v != "KILLED"]
+            return self.players_dict
+        return [v for k, v in self.players_dict.items() if k != player_information.name and not isinstance(v, str)]
 
     def remove_player(self, player_name):
         self.players_dict[player_name] = "KILLED"

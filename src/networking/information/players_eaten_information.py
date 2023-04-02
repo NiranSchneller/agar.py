@@ -16,8 +16,8 @@ class PlayersEatenInformation:
     """
 
     def ate_player(self, player_radius):
-        sum_area = player_radius ** 2 * math.pi + self.ate_radius ** 2 * math.pi
-        self.ate_radius += (sum_area / math.pi) ** 0.5
+        sum_area = (player_radius ** 2 * math.pi) + (self.ate_radius ** 2 * math.pi)
+        self.ate_radius = (sum_area / math.pi) ** 0.5
 
     """
         Resets
@@ -30,3 +30,5 @@ class PlayersEatenInformation:
 
     def killed(self):
         self.is_eaten = True
+    def get_killed(self):
+        return self.is_eaten

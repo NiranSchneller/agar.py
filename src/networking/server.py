@@ -33,14 +33,16 @@ class Server:
         self.socket.listen(max_waiting)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.threads = []
-        self.collision_detector = CollisionDetector()
-        self.collision_detector_thread = threading.Thread(target=self.__handle_collisions, args=())
-        self.collision_detector_thread.start()
+
 
         self.player_update_handler = PlayerUpdateHandler()
         self.edible_update_handler = EdibleUpdateHandler()
 
         self.player_thread = dict()
+
+        self.collision_detector = CollisionDetector()
+        self.collision_detector_thread = threading.Thread(target=self.__handle_collisions, args=())
+        self.collision_detector_thread.start()
 
         self.amount_of_clients = 0
 
@@ -78,9 +80,10 @@ class Server:
 
             player_eaten_inf = self.collision_detector.players_eaten_helper.get_eaten_status(thread_id)
             rad_increase = player_eaten_inf.get_ate_radius()
-            is_eaten = player_eaten_inf.killed()
+
+            is_eaten = player_eaten_inf.get_killed()
             lock.release()
-            if not is_eaten:
+            if is_eaten:
                 should_continue = False
             if new_edibles_other:
                 print(f"{new_edibles_other}")
@@ -92,31 +95,40 @@ class Server:
         lock.acquire() # one last time :/
         self.player_update_handler.remove_player(player_information.name)
         lock.release()
-        
-        # remove player from loc list
+
     def __handle_collisions(self):
+        saved_collisions = set()
         while True:
             lock.acquire()
             players = self.player_update_handler.get_players()
-            lock.release()  # prot v
-            collisions = self.__detect_collisions(players)
+            collisions = self.__detect_collisions(list(players.values()))
             for collision in collisions:
-                if collision[0].radius > collision[1].radius:
-                    eating_thread_id = self.player_thread[collision[0].name]
-                    eaten_thread_id = self.player_thread[collision[1].name]
-                    lock.acquire()
-                    self.collision_detector.players_eaten_helper.ate_player(eating_thread_id,
-                                                                            players[collision[1].name].radius)
-                    self.collision_detector.players_eaten_helper.player_killed(eaten_thread_id)
-                    lock.release()
+                if (collision[0].name, collision[1].name) not in saved_collisions:
+                    if collision[0].radius > collision[1].radius:
+                        eating_thread_id = self.player_thread[collision[0].name]
+                        eaten_thread_id = self.player_thread[collision[1].name]
+                        self.collision_detector.players_eaten_helper.ate_player(eating_thread_id,
+                                                                                players[collision[1].name].radius)
+                        self.collision_detector.players_eaten_helper.player_killed(eaten_thread_id)
+
+                        saved_collisions.add((collision[0].name, collision[1].name))
+                    else:
+                        eating_thread_id = self.player_thread[collision[1].name]
+                        eaten_thread_id = self.player_thread[collision[0].name]
+                        self.collision_detector.players_eaten_helper.ate_player(eating_thread_id,
+                                                                                players[collision[0].name].radius)
+                        self.collision_detector.players_eaten_helper.player_killed(eaten_thread_id)
+                        saved_collisions.add((collision[0].name, collision[1].name))
+            lock.release()
 
     def __detect_collisions(self, players):
         collisions = []
         for player_information in players:
             for collision_search in players:
-                if player_information.name != collision_search.name and collision_exists(player_information,
-                                                                                         collision_search) and player_information.radius != collision_search.radius:
-                    collisions.append((player_information, collision_search))
+                if not (isinstance(collision_search, str) or isinstance(player_information, str)):
+                    if player_information.name != collision_search.name and collision_exists(player_information,
+                                                                                             collision_search) and player_information.radius != collision_search.radius:
+                        collisions.append((player_information, collision_search))
         return collisions
 
     """

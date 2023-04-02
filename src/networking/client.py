@@ -1,3 +1,4 @@
+import math
 import random
 import socket
 import sys
@@ -92,6 +93,7 @@ class Client:
 
             if Protocol.parse_server_status_update(server_reply) == "EATEN":
                 running = False
+                print("bye")
                 break
 
             edibles_created, other_players, edibles_removed, ate_inc = Protocol.parse_server_status_update(server_reply)
@@ -137,7 +139,6 @@ def update_window(player, player_camera, edibles, client: Client, other_player_i
 
 def draw_other_players(other_player_information : [PlayerInformation], coords):
     for player_information in other_player_information:
-        print("drawing")
         draw_other_player(player_information.x, player_information.y, player_information.radius, PlayerConstants.PLAYER_COLOR, coords)
 
 def draw_other_player(x, y, radius, color, coordinate_helper):
@@ -200,7 +201,6 @@ def start(width, height, name):
             if event.type == pygame.QUIT:
                 running = False
                 # TODO: terminate the client server connection
-
         update_window(player, player_camera, world_information.edibles, client, world_information.players)
         clock.tick(GameSettings.FPS)
     pygame.quit()

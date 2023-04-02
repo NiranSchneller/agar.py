@@ -27,7 +27,6 @@ class Player:
         self.y = PlatformConstants.PLATFORM_HEIGHT / 2
         self.radius = PlayerConstants.PLAYER_STARTING_RADIUS
 
-
     """
         Function calculates current position change with respect to the mouse (follower)
         and current velocity
@@ -47,7 +46,7 @@ class Player:
         if distance < PlayerConstants.DISTANCE_THRESHOLD:
             self.velocity = 0
         else:
-            self.velocity = PlayerConstants.PLAYER_VELOCITY * (PlayerConstants.PLAYER_STARTING_RADIUS / self.radius)
+            self.velocity = PlayerConstants.PLAYER_VELOCITY
 
         self.x += self.velocity * math.cos(angle)
         self.y += self.velocity * math.sin(angle)
