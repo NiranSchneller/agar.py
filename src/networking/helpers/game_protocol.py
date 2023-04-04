@@ -64,9 +64,9 @@ class Protocol:
     """
 
     @staticmethod
-    def generate_client_status_update(player_x, player_y, player_radius, name, edibles: [Edible] = None):
+    def generate_client_status_update(player_x, player_y, player_radius, name, id, edibles: [Edible] = None):
         message = '~'
-        message += f'{name},{player_x},{player_y},{player_radius}~'
+        message += f'{id},{name},{player_x},{player_y},{player_radius}~'
 
         if edibles is not None:
             for edible in edibles:
@@ -88,9 +88,10 @@ class Protocol:
 
         # location of player in world coordinates
         player_information = message_list[1].split(',')
-        player_name = player_information[0]
-        player_location = float(player_information[1]), float(player_information[2])
-        player_radius  = float(player_information[3])
+        player_uuid = player_information[0]
+        player_name = player_information[1]
+        player_location = float(player_information[2]), float(player_information[3])
+        player_radius = float(player_information[4])
 
         eaten_edibles = []
         # update the server if any edibles were eaten
@@ -105,7 +106,7 @@ class Protocol:
                     color = make_tuple(params[2].replace(':', ','))
                     radius = int(params[3])
                     eaten_edibles.append(Edible(edible_x, edible_y, color, radius))
-        return PlayerInformation(player_location[0], player_location[1], player_radius, player_name), eaten_edibles
+        return PlayerInformation(player_location[0], player_location[1], player_radius, player_name, player_uuid), eaten_edibles
 
 
 

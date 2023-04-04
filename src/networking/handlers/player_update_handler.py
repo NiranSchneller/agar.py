@@ -11,7 +11,7 @@ class PlayerUpdateHandler:
         self.players_dict = dict()
 
     def update_player(self, player_information: PlayerInformation):
-        self.players_dict[player_information.name] = player_information
+        self.players_dict[player_information.id] = player_information
 
     """
         Returns the information about all of the players except player given as parameter
@@ -22,7 +22,7 @@ class PlayerUpdateHandler:
     def get_players(self, player_information: PlayerInformation = None):
         if player_information is None:
             return self.players_dict
-        return [v for k, v in self.players_dict.items() if k != player_information.name and not isinstance(v, str)]
+        return [v for k, v in self.players_dict.items() if k != player_information.id and not isinstance(v, str)]
 
     def remove_player(self, player_name):
         self.players_dict[player_name] = "KILLED"
