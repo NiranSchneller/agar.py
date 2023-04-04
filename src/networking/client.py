@@ -3,6 +3,7 @@ import random
 import socket
 import sys
 import threading
+import uuid
 
 import pygame
 
@@ -14,7 +15,7 @@ from src.networking.helpers.game_protocol import Protocol
 from src.player import Player
 from src.player_camera import PlayerCamera
 from src.networking.helpers.utils import recv_by_size, send_with_size
-
+from uuid import uuid4
 window = None
 pygame.init()
 score = 0
@@ -82,10 +83,12 @@ class Client:
     """
     def __handle_connection(self):
         global running
+        unique_id = uuid.uuid4().hex
         while running:
             message = Protocol.generate_client_status_update(self.player_information.x, self.player_information.y,
                                                              self.player_information.radius,
                                                              self.player_information.name,
+                                                             unique_id,
                                                              self.edible_eaten_list.copy())
             self.edible_eaten_list.clear()
 
