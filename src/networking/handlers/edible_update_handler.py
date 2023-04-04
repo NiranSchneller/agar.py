@@ -29,6 +29,4 @@ class EdibleUpdateHandler:
         Fetches for the thread required information about the edibles created and removed by other players
     """
     def fetch_thread_specific_edible_updates(self, thread_id):
-        if self.edible_updates[thread_id].edibles_removed:
-            print(f"Fetching holy crap!!! (thread {thread_id})")
         return self.edible_updates[thread_id].fetch_edibles_removed(), self.edible_updates[thread_id].fetch_edibles_created()

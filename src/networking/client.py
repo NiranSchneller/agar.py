@@ -184,10 +184,10 @@ def update_edibles(player, player_camera, edibles, client):
             edibles.remove(edible)
 
 
-def start(width, height, name):
+def start(name, ip, port, screen):
 
     global window
-    window = pygame.display.set_mode((width, height))
+    window = screen
 
     global player
     global player_camera
@@ -195,8 +195,8 @@ def start(width, height, name):
     player_camera = PlayerCamera(window)
     world_information = WorldInformation()
     player_information = PlayerInformation(player.x, player.y, player.radius, player.name)
-
-    client = Client("192.168.1.29", 34197, world_information, player_information)
+    print(f"Client will connect to: {ip}:{port}")
+    client = Client(ip, port, world_information, player_information)
     client.start_client()
 
     clock = pygame.time.Clock()
@@ -205,7 +205,6 @@ def start(width, height, name):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-                # TODO: terminate the client server connection
         update_window(player, player_camera, world_information.edibles, client, world_information.players)
         clock.tick(GameSettings.FPS)
     pygame.quit()

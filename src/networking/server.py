@@ -27,10 +27,11 @@ class Server:
 
     """
 
-    def __init__(self, max_waiting, ip='0.0.0.0', port=34197):
+    def __init__(self, max_waiting, ip='0.0.0.0', port=0):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((ip, port))
         self.socket.listen(max_waiting)
+        print(f"Socket addr and port: {self.socket.getsockname()}")
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.threads = []
 
@@ -65,11 +66,6 @@ class Server:
             for edible in edibles_eaten:
                 new_edibles.append(world.delete_edible(edible))
 
-            if new_edibles:
-                print(f"New edibles: {new_edibles}")
-            if edibles_eaten:
-                print(f"Edibles eaten: {edibles_eaten}")
-
             lock.acquire()
 
             self.edible_update_handler.notify_threads_changing_edible_status(new_edibles, edibles_eaten, thread_id)
@@ -85,8 +81,6 @@ class Server:
             lock.release()
             if is_eaten:
                 should_continue = False
-            if new_edibles_other:
-                print(f"{new_edibles_other}")
             new_edibles = new_edibles + new_edibles_other
             send_with_size(client_socket, Protocol.generate_server_status_update(new_edibles, other_player_information,
                                                                                  edibles_removed, rad_increase, is_eaten))
@@ -147,7 +141,7 @@ def start():
     global world
     world = World(PlatformConstants.PLATFORM_WIDTH, PlatformConstants.PLATFORM_HEIGHT)
     world.spawn_edibles(EdibleConstants.AMOUNT_OF_EDIBLES)
-
+    print("Accepting Clients....")
     server = Server(2)
 
     while True:
