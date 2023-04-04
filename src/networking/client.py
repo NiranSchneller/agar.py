@@ -16,6 +16,15 @@ from src.player import Player
 from src.player_camera import PlayerCamera
 from src.networking.helpers.utils import recv_by_size, send_with_size
 from uuid import uuid4
+
+POSSIBLE_FONT_SIZES = range(10, 40)
+def get_max_font_size(text, width):
+    for size in reversed(POSSIBLE_FONT_SIZES):
+        font = pygame.font.SysFont(None, size)
+        if font.size(text)[0] <= width:
+            return size
+    return POSSIBLE_FONT_SIZES[0]
+
 window = None
 pygame.init()
 score = 0
@@ -146,9 +155,10 @@ def update_window(player, player_camera, edibles, client: Client, other_player_i
 
 def draw_other_players(other_player_information : [PlayerInformation], coords):
     for player_information in other_player_information:
-        draw_other_player(player_information.x, player_information.y, player_information.radius, PlayerConstants.PLAYER_COLOR, coords)
+        draw_other_player(player_information.x, player_information.y, player_information.radius, PlayerConstants.PLAYER_COLOR, player_information.name, coords)
 
-def draw_other_player(x, y, radius, color, coordinate_helper):
+
+def draw_other_player(x, y, radius, color, name, coordinate_helper):
     screen_radius = coordinate_helper.platform_to_screen_radius(radius)
     screen_x, screen_y = coordinate_helper.platform_to_screen_coordinates((x, y))
 
@@ -157,7 +167,12 @@ def draw_other_player(x, y, radius, color, coordinate_helper):
         pygame.draw.circle(window, PlayerConstants.PLAYER_OUTLINE_COLOR, (screen_x, screen_y),
                            screen_radius,
                            PlayerConstants.PLAYER_STARTING_OUTLINE_THICKNESS)
-
+        font_size = int(get_max_font_size(name, radius))
+        font = pygame.font.SysFont("Arial", font_size)
+        name_surface = font.render(name, True, (255,255,255))
+        name_rect = name_surface.get_rect()
+        name_rect.center = (screen_x, screen_y)
+        window.blit(name_surface, name_rect)
 
 
 def draw_text(text, font, text_col, x, y):
