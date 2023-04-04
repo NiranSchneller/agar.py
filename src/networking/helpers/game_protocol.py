@@ -91,7 +91,7 @@ class Protocol:
         player_uuid = player_information[0]
         player_name = player_information[1]
         player_location = float(player_information[2]), float(player_information[3])
-        player_radius  = float(player_information[4])
+        player_radius = float(player_information[4])
 
         eaten_edibles = []
         # update the server if any edibles were eaten
