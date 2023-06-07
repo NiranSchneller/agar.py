@@ -6,6 +6,7 @@ import threading
 import uuid
 
 import pygame
+import pygame_menu
 
 from src.constants import GameSettings, PlayerConstants, EdibleConstants, PlatformConstants
 from src.networking.helpers import game_protocol
@@ -16,6 +17,7 @@ from src.player import Player
 from src.player_camera import PlayerCamera
 from src.networking.helpers.utils import recv_by_size, send_with_size
 from uuid import uuid4
+THEME = pygame_menu.themes.THEME_BLUE
 
 POSSIBLE_FONT_SIZES = range(10, 40)
 def get_max_font_size(text, width):
@@ -27,6 +29,7 @@ def get_max_font_size(text, width):
 
 window = None
 pygame.init()
+client_thread = None
 score = 0
 FONT = pygame.font.SysFont('arial', 40)
 running = True
@@ -84,6 +87,8 @@ class Client:
         self.world_information.width, self.world_information.height = world_size
 
         self.thread = threading.Thread(target=self.__handle_connection, args=())
+        global client_thread
+        client_thread = self.thread
         self.thread.start()
 
 
@@ -106,19 +111,18 @@ class Client:
 
             if Protocol.parse_server_status_update(server_reply) == "EATEN":
                 running = False
-                print("bye")
-                break
+            else: 
+                edibles_created, other_players, edibles_removed, ate_inc = Protocol.parse_server_status_update(server_reply)
 
-            edibles_created, other_players, edibles_removed, ate_inc = Protocol.parse_server_status_update(server_reply)
+                self.world_information.remove_edibles(edibles_removed)
+                self.world_information.add_edibles(edibles_created)
+                self.world_information.set_players(other_players)
 
-            self.world_information.remove_edibles(edibles_removed)
-            self.world_information.add_edibles(edibles_created)
-            self.world_information.set_players(other_players)
-
-            global player
-            player.radius += ate_inc
-            player_camera.edible_eaten(player.radius / PlayerConstants.PLAYER_STARTING_RADIUS,
-                                       player.radius / PlayerConstants.PLAYER_STARTING_RADIUS)
+                global player
+                player.radius += ate_inc
+                player_camera.edible_eaten(player.radius / PlayerConstants.PLAYER_STARTING_RADIUS,
+                                        player.radius / PlayerConstants.PLAYER_STARTING_RADIUS)
+            
 
 
 
@@ -210,30 +214,33 @@ def update_edibles(player, player_camera, edibles, client):
 
 
 def start(name, ip, port, screen):
-
-    global window
-    window = screen
-
-    global player
-    global player_camera
-    player = Player(name)
-    player_camera = PlayerCamera(window)
-    world_information = WorldInformation()
-    player_information = PlayerInformation(player.x, player.y, player.radius, player.name)
-    print(f"Client will connect to: {ip}:{port}")
-    client = Client(ip, port, world_information, player_information)
-    client.start_client()
-
-    clock = pygame.time.Clock()
-    global running
-    quit = False
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-                quit = True
-        update_window(player, player_camera, world_information.edibles, client, world_information.players)
-        clock.tick(GameSettings.FPS)
-    if not quit:
-        from agar.py import death_menu
-        death_menu()
+    try: 
+        global running
+        running = True # for more than 1st run
+        global window
+        window = screen
+        global player
+        global player_camera
+        player = Player(name)
+        player_camera = PlayerCamera(window)
+        world_information = WorldInformation()
+        player_information = PlayerInformation(player.x, player.y, player.radius, player.name)
+        print(f"Client will connect to: {ip}:{port}")
+        client = Client(ip, port, world_information, player_information)
+        client.start_client()
+    except:
+        print("Problem during initialization!")
+        sys.exit()
+    try: 
+        clock = pygame.time.Clock()
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+            update_window(player, player_camera, world_information.edibles, client, world_information.players)
+            clock.tick(GameSettings.FPS)
+    except:
+        print("Problem while running!")
+        sys.exit()
+    global client_thread
+    client_thread.join()

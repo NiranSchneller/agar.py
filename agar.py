@@ -30,9 +30,9 @@ def main_menu():
 
 def death_menu():
     death = pygame_menu.menu.Menu("agar.py!", 1920, 1080, theme=THEME)
-    death.add.label("You Died").scale(4,4,False)
-    death.add.button("Play Again!", main_menu).scale(4,4,False)
-    death.add.button("Quit", pygame.quit).scale(4, 4, False)
+    death.add.label("You Died!").scale(4,4,False)
+    death.add.button("Play Again!", main_menu).scale(3,3,False)
+    death.add.button("Quit", pygame.quit).scale(3, 3, False)
     death.mainloop(window)
 
 def start_server():
@@ -45,6 +45,7 @@ def start_client(name, ip, port):
     except:
         print("Invalid Parameters!")
         set_ip_and_port()
+    death_menu()
 if __name__ == '__main__':
     window = pygame.display.set_mode((1920, 1080))
     main_menu()
