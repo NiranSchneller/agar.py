@@ -37,8 +37,10 @@ class Player:
         self.velocity = math.fabs(PlayerConstants.PLAYER_VELOCITY)
         # actual player pos goes by the platform he is on
         self.radius = PlayerConstants.PLAYER_STARTING_RADIUS
-        self.x = random.randint(self.radius, PlatformConstants.PLATFORM_WIDTH - self.radius)
-        self.y = random.randint(self.radius, PlatformConstants.PLATFORM_HEIGHT - self.radius)
+        #self.x = random.randint(self.radius, PlatformConstants.PLATFORM_WIDTH - self.radius)
+        #self.y = random.randint(self.radius, PlatformConstants.PLATFORM_HEIGHT - self.radius)
+        self.x = PlatformConstants.PLATFORM_WIDTH / 2
+        self.y = PlatformConstants.PLATFORM_HEIGHT / 2
     """
         Function calculates current position change with respect to the mouse (follower)
         and current velocity
