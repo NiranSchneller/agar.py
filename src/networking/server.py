@@ -1,10 +1,12 @@
+import sys
 import threading
 
 from src.constants import EdibleConstants, PlatformConstants
 from src.networking.handlers.collision_detector import CollisionDetector
 from src.networking.handlers.player_update_handler import PlayerUpdateHandler
 from src.networking.handlers.edible_update_handler import EdibleUpdateHandler
-
+import traceback
+import time
 from src.world import World
 import socket
 from src.networking.helpers.utils import send_with_size, recv_by_size
@@ -56,35 +58,41 @@ class Server:
 
         should_continue = True
         # start getting status updates from the client
-        while should_continue:
-            message = recv_by_size(client_socket)  # recieve update
-            player_information, edibles_eaten = Protocol.parse_client_status_update(message)
+        try:
+            while should_continue:
+                try: 
+                    message = recv_by_size(client_socket)  # recieve update
+                    player_information, edibles_eaten = Protocol.parse_client_status_update(message)
+                except:
+                    print("Client disconnected. Terminating thread and player")
+                    break
+                self.player_thread[player_information.id] = thread_id  # for collision detection
 
-            self.player_thread[player_information.id] = thread_id  # for collision detection
+                new_edibles = []
+                for edible in edibles_eaten:
+                    new_edibles.append(world.delete_edible(edible))
 
-            new_edibles = []
-            for edible in edibles_eaten:
-                new_edibles.append(world.delete_edible(edible))
+                lock.acquire()
 
-            lock.acquire()
+                self.edible_update_handler.notify_threads_changing_edible_status(new_edibles, edibles_eaten, thread_id)
+                self.player_update_handler.update_player(player_information)
+                other_player_information = self.player_update_handler.get_players(player_information)
+                edibles_removed, new_edibles_other = self.edible_update_handler.fetch_thread_specific_edible_updates(
+                    thread_id)
 
-            self.edible_update_handler.notify_threads_changing_edible_status(new_edibles, edibles_eaten, thread_id)
-            self.player_update_handler.update_player(player_information)
-            other_player_information = self.player_update_handler.get_players(player_information)
-            edibles_removed, new_edibles_other = self.edible_update_handler.fetch_thread_specific_edible_updates(
-                thread_id)
+                player_eaten_inf = self.collision_detector.players_eaten_helper.get_eaten_status(thread_id)
+                rad_increase = player_eaten_inf.get_ate_radius()
 
-            player_eaten_inf = self.collision_detector.players_eaten_helper.get_eaten_status(thread_id)
-            rad_increase = player_eaten_inf.get_ate_radius()
-
-            is_eaten = player_eaten_inf.get_killed()
-            lock.release()
-            if is_eaten:
-                should_continue = False
-            new_edibles = new_edibles + new_edibles_other
-            send_with_size(client_socket, Protocol.generate_server_status_update(new_edibles, other_player_information,
-                                                                                 edibles_removed, rad_increase, is_eaten))
-
+                is_eaten = player_eaten_inf.get_killed()
+                lock.release()
+                if is_eaten:
+                    should_continue = False
+                new_edibles = new_edibles + new_edibles_other
+                send_with_size(client_socket, Protocol.generate_server_status_update(new_edibles, other_player_information,
+                                                                                    edibles_removed, rad_increase, is_eaten))
+        except:
+            print("Thread error, tracing")
+            traceback.print_exc()
         # close resources
         lock.acquire() # one last time :/
         self.player_update_handler.remove_player(player_information.id)
@@ -138,12 +146,23 @@ class Server:
 
 
 def start():
-    global world
-    world = World(PlatformConstants.PLATFORM_WIDTH, PlatformConstants.PLATFORM_HEIGHT)
-    world.spawn_edibles(EdibleConstants.AMOUNT_OF_EDIBLES)
-    print("Accepting Clients....")
-    server = Server(2)
-
-    while True:
-        # wait for new clients.
-        server.accept()
+    try: 
+        global world
+        world = World(PlatformConstants.PLATFORM_WIDTH, PlatformConstants.PLATFORM_HEIGHT)
+        world.spawn_edibles(EdibleConstants.AMOUNT_OF_EDIBLES)
+        print("Accepting Clients....")
+        server = Server(2)
+    except:
+        print("Problem during server initialization, Printing stack trace")
+        traceback.print_exc()
+        time.sleep(5)
+        sys.exit()
+    
+    try:
+        while True:
+            # wait for new clients.
+            server.accept()
+    except:
+        print("Critical Server Crash! Printing stack trace")
+        traceback.print_exc()
+        time.sleep(5)
