@@ -28,6 +28,13 @@ def main_menu():
     main_menu.add.button("Quit", pygame.quit).scale(4, 4, False)
     main_menu.mainloop(window)
 
+def death_menu():
+    death = pygame_menu.menu.Menu("agar.py!", 1920, 1080, theme=THEME)
+    death.add.label("You Died").scale(4,4,False)
+    death.add.button("Play Again!", main_menu).scale(4,4,False)
+    death.add.button("Quit", pygame.quit).scale(4, 4, False)
+    death.mainloop(window)
+
 def start_server():
     pygame.quit()
     server.start()

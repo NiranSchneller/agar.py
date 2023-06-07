@@ -148,9 +148,16 @@ def update_window(player, player_camera, edibles, client: Client, other_player_i
     update_edibles(player, player_camera, edibles, client)
     draw_other_players(other_player_information, player_camera.coordinate_helper)
     player.execute(PlayerConstants.PLAYER_COLOR, window, player_camera.coordinate_helper)
+    draw_bigger_players(other_player_information, player_camera.coordinate_helper, player.radius)
     update_score()
     client.update_player_information(player.x, player.y, player.radius)
     pygame.display.flip()
+
+
+def draw_bigger_players(other_player_information : [PlayerInformation], coords, player_radius):
+    for player_information in other_player_information:
+        if player_information.radius > player_radius:
+            draw_other_player(player_information.x, player_information.y, player_information.radius, PlayerConstants.PLAYER_COLOR, player_information.name, coords)
 
 
 def draw_other_players(other_player_information : [PlayerInformation], coords):
@@ -219,10 +226,14 @@ def start(name, ip, port, screen):
 
     clock = pygame.time.Clock()
     global running
+    quit = False
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                quit = True
         update_window(player, player_camera, world_information.edibles, client, world_information.players)
         clock.tick(GameSettings.FPS)
-    pygame.quit()
+    if not quit:
+        from agar.py import death_menu
+        death_menu()
