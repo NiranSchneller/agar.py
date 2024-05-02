@@ -1,4 +1,5 @@
 import socket, struct
+from typing import Union
 
 DELIMETER = "~"
 SIZE_HEADER_FORMAT = "00000000~"  # n digits for data size + one delimiter
@@ -6,7 +7,7 @@ size_header_size = len(SIZE_HEADER_FORMAT)
 TCP_DEBUG = False
 
 
-def recv_by_size(sock, return_type="string"):
+def recv_by_size(sock, return_type="string") -> str:
     str_size = b""
     data_len = 0
     while len(str_size) < size_header_size:
@@ -39,7 +40,7 @@ def recv_by_size(sock, return_type="string"):
         data = b""  # Partial data is like no data !
     if return_type == "string":
         return data.decode()
-    return data
+    return data # type: ignore
 
 
 

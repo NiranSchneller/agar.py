@@ -43,7 +43,7 @@ class Player:
     @staticmethod
     def get_max_font_size(text, width):
         for size in reversed(POSSIBLE_FONT_SIZES):
-            font = pygame.font.SysFont(None, size)
+            font = pygame.font.SysFont(None, size) # type: ignore
             if font.size(text)[0] <= width:
                 return size
         return POSSIBLE_FONT_SIZES[0]

@@ -5,12 +5,14 @@
     Handles updating each thread about changing status of edibles
     Every thread has an index in the array from which it pulls the relevant edible information
 """
+from typing import List, Tuple
+from edible import Edible
 from src.networking.helpers.thread_update_helper import ThreadUpdateHelper
 
 class EdibleUpdateHandler:
 
     def __init__(self):
-        self.edible_updates : [ThreadUpdateHelper] = []
+        self.edible_updates: List[ThreadUpdateHelper] = []
 
     def make_space_for_new_thread(self):
         self.edible_updates.append(ThreadUpdateHelper())
@@ -28,5 +30,5 @@ class EdibleUpdateHandler:
     """
         Fetches for the thread required information about the edibles created and removed by other players
     """
-    def fetch_thread_specific_edible_updates(self, thread_id):
+    def fetch_thread_specific_edible_updates(self, thread_id: int) -> Tuple[List[Edible], List[Edible]]:
         return self.edible_updates[thread_id].fetch_edibles_removed(), self.edible_updates[thread_id].fetch_edibles_created()

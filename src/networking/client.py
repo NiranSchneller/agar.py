@@ -8,6 +8,7 @@ import traceback
 import pygame
 import pygame_menu
 
+from coordinate_system import CoordinateSystemHelper
 from src.constants import GameSettings, PlayerConstants, EdibleConstants, PlatformConstants, PlayerCameraConstants
 from src.networking.helpers import game_protocol
 from src.edible import Edible
@@ -17,59 +18,60 @@ from src.player import Player
 from src.player_camera import PlayerCamera
 from src.networking.helpers.utils import recv_by_size, send_with_size
 from uuid import uuid4
-THEME = pygame_menu.themes.THEME_BLUE
+from typing import List
+THEME = pygame_menu.themes.THEME_BLUE # type: ignore
 
 POSSIBLE_FONT_SIZES = range(10, 40)
 
 
 def get_max_font_size(text, width):
     for size in reversed(POSSIBLE_FONT_SIZES):
-        font = pygame.font.SysFont(None, size)
+        font = pygame.font.SysFont(None, size)  # type: ignore
         if font.size(text)[0] <= width:
             return size
     return POSSIBLE_FONT_SIZES[0]
 
 
-window = None
+window: pygame.Surface = None  # type: ignore
 pygame.init()
-client_thread = None
+client_thread: threading.Thread = None # type: ignore
 score = 0
 FONT = pygame.font.SysFont('arial', 40)
 running = True
-player: Player = None
-player_camera: PlayerCamera = None
+player = None  # type: ignore
+player_camera = None  # type: ignore
 
 
 class WorldInformation:
 
     def __init__(self):
-        self.width = 0
-        self.height = 0
-        self.edibles = []
-        self.players: [PlayerInformation] = []
+        self.width: int = 0
+        self.height: int = 0
+        self.edibles: List[Edible] = []
+        self.players: List[PlayerInformation] = []
 
-    def initiate_edibles(self, edibles: [Edible]):
+    def initiate_edibles(self, edibles: List[Edible]):
         self.edibles = edibles
 
-    def __add_edible(self, edible):
+    def __add_edible(self, edible: Edible):
         self.edibles.append(edible)
 
-    def add_edibles(self, edibles: [Edible]):
+    def add_edibles(self, edibles: List[Edible]):
         for edible in edibles:
             self.__add_edible(edible)
 
-    def remove_edibles(self, edibles_removed):
+    def remove_edibles(self, edibles_removed: List[Edible]):
         for edible in edibles_removed:
             self.edibles.remove(edible)
 
-    def set_players(self, other_players):
+    def set_players(self, other_players: List[PlayerInformation]):
         self.players = other_players
 
 
 class Client:
-    def __init__(self, host, port, world_information: WorldInformation, player_information: PlayerInformation):
-        self.socket = socket.socket()
-        self.thread = None
+    def __init__(self, host: str, port: int, world_information: WorldInformation, player_information: PlayerInformation):
+        self.socket: socket.socket = socket.socket()
+        self.thread: threading.Thread = None  # type: ignore
         try:
             self.socket.connect((host, port))
             print("Connected")
@@ -78,20 +80,20 @@ class Client:
             sys.exit()
 
         # To Handle sending data
-        self.world_information = world_information
-        self.player_information = player_information
-        self.edible_eaten_list = list()
+        self.world_information: WorldInformation = world_information
+        self.player_information: PlayerInformation = player_information
+        self.edible_eaten_list: List[Edible] = list()
 
     """
         Starts recieving and sending messages, opens a seperate thread
     """
 
     def start_client(self):
-        message = recv_by_size(self.socket)
+        message: str = recv_by_size(self.socket)
         world_size, edibles = game_protocol.Protocol.parse_server_initiate_world(
             message)
         self.world_information.initiate_edibles(edibles)
-        self.world_information.width, self.world_information.height = world_size
+        self.world_information.width, self.world_information.height = world_size  # type: ignore
 
         self.thread = threading.Thread(
             target=self.__handle_connection, args=())
@@ -123,13 +125,16 @@ class Client:
             else:
                 edibles_created, other_players, edibles_removed, ate_inc = Protocol.parse_server_status_update(
                     server_reply)
-
-                self.world_information.remove_edibles(edibles_removed)
-                self.world_information.add_edibles(edibles_created)
-                self.world_information.set_players(other_players)
+                # If we got here then the reply can't be a string
+                self.world_information.remove_edibles(
+                    edibles_removed)  # type: ignore
+                self.world_information.add_edibles(
+                    edibles_created)  # type: ignore
+                self.world_information.set_players(
+                    other_players)  # type: ignore
 
                 global player
-                player.radius += ate_inc
+                player.radius += ate_inc  # type: ignore
                 player_camera.edible_eaten(player.radius / PlayerConstants.PLAYER_STARTING_RADIUS,
                                            player.radius / PlayerConstants.PLAYER_STARTING_RADIUS)
 
@@ -144,13 +149,14 @@ class Client:
         This information is sent to the server to update location
     """
 
-    def update_player_information(self, x, y, radius):
+    def update_player_information(self, x: int, y: int, radius: float):
         self.player_information.x = x
         self.player_information.y = y
         self.player_information.radius = radius
 
 
-def update_window(player, player_camera, edibles, client: Client, other_player_information, world_information_dimensions):
+def update_window(player: Player, player_camera: PlayerCamera, edibles: List[Edible], client: Client,
+                  other_player_information: List[PlayerInformation], world_information_dimensions):
     player_camera.update_window(player.get_position())
     update_edibles(player, player_camera, edibles, client)
     draw_other_players(other_player_information,
@@ -171,7 +177,7 @@ MINIMAP_POSE = (0, 0)  # (X,Y)
 MINIMAP_BORDER_SIZE = 5
 
 
-def update_minimap(other_player_information: [PlayerInformation], world_information_dimensions, edibles):
+def update_minimap(other_player_information: List[PlayerInformation], world_information_dimensions, edibles):
     other_player_information.append(PlayerInformation(
         player.x, player.y, player.radius, player.name, "MyPlayer"))
 
@@ -216,24 +222,25 @@ def update_minimap(other_player_information: [PlayerInformation], world_informat
             font = pygame.font.SysFont("Arial", font_size)
             name_surface = font.render("You", True, (255, 255, 255))
             name_rect = name_surface.get_rect()
-            name_rect.center = (player_minimap_x, player_minimap_y)
+            name_rect.center = (player_minimap_x, player_minimap_y) # type: ignore
             window.blit(name_surface, name_rect)
 
 
-def draw_bigger_players(other_player_information: [PlayerInformation], coords, player_radius):
+def draw_bigger_players(other_player_information: List[PlayerInformation], coords: CoordinateSystemHelper,
+                        player_radius: float):
     for player_information in other_player_information:
         if player_information.radius > player_radius:
             draw_other_player(player_information.x, player_information.y, player_information.radius,
                               PlayerConstants.PLAYER_COLOR, player_information.name, coords)
 
 
-def draw_other_players(other_player_information: [PlayerInformation], coords):
+def draw_other_players(other_player_information: List[PlayerInformation], coords: CoordinateSystemHelper):
     for player_information in other_player_information:
         draw_other_player(player_information.x, player_information.y, player_information.radius,
                           PlayerConstants.PLAYER_COLOR, player_information.name, coords)
 
 
-def draw_other_player(x, y, radius, color, name, coordinate_helper):
+def draw_other_player(x: int, y: int, radius: float, color, name: str, coordinate_helper: CoordinateSystemHelper):
     screen_radius = coordinate_helper.platform_to_screen_radius(radius)
     screen_x, screen_y = coordinate_helper.platform_to_screen_coordinates(
         (x, y))
@@ -263,7 +270,7 @@ def update_score():
     window.blit(text, text_rect)
 
 
-def update_edibles(player, player_camera, edibles, client):
+def update_edibles(player: Player, player_camera: PlayerCamera, edibles: List[Edible], client: Client):
     global score
 
     for edible in edibles:
@@ -279,21 +286,25 @@ def update_edibles(player, player_camera, edibles, client):
             edibles.remove(edible)
 
 
-def start(name, ip, port, screen):
+def start(name: str, ip: str, port: int, screen: pygame.Surface):
     try:
         global running
-        running = True  # for more than 1st run
         global window
-        window = screen
         global player
         global player_camera
-        player = Player(name)
-        player_camera = PlayerCamera(window)
-        world_information = WorldInformation()
+        running = True  # for more than 1st run
+        window = screen
+        
+        player: Player = Player(name)
+        player_camera: PlayerCamera = PlayerCamera(window)
+        world_information: WorldInformation = WorldInformation()
         player_information = PlayerInformation(
             player.x, player.y, player.radius, player.name)
+        
         print(f"Client will connect to: {ip}:{port}")
-        client = Client(ip, port, world_information, player_information)
+        
+        client: Client = Client(
+            ip, port, world_information, player_information)
         client.start_client()
     except:
         print("Problem during initialization!")
@@ -308,7 +319,7 @@ def start(name, ip, port, screen):
                           client, world_information.players, (world_information.width, world_information.height))
             clock.tick(GameSettings.FPS)
     except:
-        print("Problem while running!, stacktrace: " + traceback.print_exc())
+        print(f"Problem while running!, stacktrace: {traceback.print_exc()}")
 
         sys.exit()
     global client_thread

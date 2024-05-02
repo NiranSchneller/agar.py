@@ -31,8 +31,6 @@ class PlayerCamera:
         self.update_position(player_pos)
         self.width = self.width_interpolator.lerp()
         self.height = self.height_interpolator.lerp()
-        # self.draw_grids(player_pos)
-        # print(f"{self.width},{self.height}")
 
 
     """

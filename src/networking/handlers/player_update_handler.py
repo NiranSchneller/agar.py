@@ -1,3 +1,4 @@
+from typing import Dict, List, Union
 from src.networking.information.player_information import PlayerInformation
 
 """ 
@@ -19,7 +20,7 @@ class PlayerUpdateHandler:
         If nothing in dict returns -> []
     """
 
-    def get_players(self, player_information: PlayerInformation = None):
+    def get_players(self, player_information: Union[PlayerInformation, None] = None) -> Union[Dict[str, PlayerInformation], List[PlayerInformation]]:
         if player_information is None:
             return self.players_dict
         return [v for k, v in self.players_dict.items() if k != player_information.id and not isinstance(v, str)]

@@ -30,4 +30,4 @@ class PlatformConstants:
 
 class GameSettings:
     GAME_NAME = "Agar.py"
-    FPS = 60
+    FPS = 144
