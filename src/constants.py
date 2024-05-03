@@ -2,8 +2,8 @@ import pygame
 
 
 class PlayerCameraConstants:
-    SCREEN_WIDTH = 1920
-    SCREEN_HEIGHT = 1080
+    SCREEN_WIDTH = 1280
+    SCREEN_HEIGHT = 720
     GRID_LINE_COLOR = 180, 180, 180
     BACKGROUND_COLOR = 173, 216, 230
     WINDOW_GRID_SPACING = 50  # pixels

@@ -1,3 +1,4 @@
+from src.constants import PlayerCameraConstants
 from src.database import DatabaseHelper
 import src.networking.client as client
 import src.networking.server as server
@@ -8,8 +9,8 @@ pygame.init()
 """
     Runs main.
 """
-WIDTH = 1920
-HEIGHT = 1080
+WIDTH = PlayerCameraConstants.SCREEN_WIDTH
+HEIGHT = PlayerCameraConstants.SCREEN_HEIGHT
 THEME = pygame_menu.themes.THEME_BLUE  # type: ignore
 window = None
 database = None
@@ -72,7 +73,7 @@ def main_menu():
 def death_menu():
     try:
         death = pygame_menu.menu.Menu(
-            "agar.py!", 1920, 1080, theme=THEME)  # type: ignore
+            "agar.py!", WIDTH, HEIGHT, theme=THEME)  # type: ignore
         death.add.label("You Died!").scale(4, 4, False)
         death.add.button("Play Again!", main_menu).scale(3, 3, False)
         death.add.button("Quit", pygame.quit).scale(3, 3, False)
