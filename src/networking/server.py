@@ -42,7 +42,8 @@ class Server:
         self.socket.listen(max_waiting)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-        print(f"Socket addr and port: {self.socket.getsockname()}")
+        print(
+            f"Socket addr and port: {socket.gethostbyname(socket.gethostname())}:{self.socket.getsockname()[1]}")
         self.threads: List[threading.Thread] = []
 
         self.player_update_handler: PlayerUpdateHandler = PlayerUpdateHandler()
