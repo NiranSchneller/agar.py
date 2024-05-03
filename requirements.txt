@@ -1,2 +1,4 @@
-pygame==2.3.0
-pygame_menu==4.4.1
+cryptography==41.0.4
+pygame==2.5.1
+pygame_menu==4.4.3
+pymongo==4.7.1
