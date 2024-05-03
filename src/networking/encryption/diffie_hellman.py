@@ -4,7 +4,7 @@ from src.networking.encryption.protocol import DHProtocol
 from src.networking.helpers.utils import send_with_size, recv_by_size
 import socket
 
-LOG_PARAMETERS = True
+LOG_PARAMETERS = False
 
 """
     Adheres to utils.py protocol

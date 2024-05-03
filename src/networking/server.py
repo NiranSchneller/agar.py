@@ -2,6 +2,7 @@ import sys
 import threading
 from typing import Dict, List
 
+from src.networking.encryption.aes import AES
 from src.networking.encryption.diffie_hellman import DiffieHelman
 from src.networking.information.player_information import PlayerInformation
 from src.networking.information.players_eaten_information import PlayersEatenInformation
@@ -60,12 +61,13 @@ class Server:
 
     def __handle_client(self, client_socket: socket.socket, address: str, thread_id: int):
         self.diffie_hellman.key_exchange(client_socket)
+        aes: AES = AES(self.diffie_hellman.final_secret)
 
         # Send first message
         message: str = Protocol.server_initiate_world(
             (world.width, world.height), world.edibles)
 
-        send_with_size(client_socket, message)
+        send_with_size(client_socket, aes.encrypt(message))
 
         self.edible_update_handler.make_space_for_new_thread()
         self.collision_detector.players_eaten_helper.make_space_for_thread()
@@ -75,8 +77,9 @@ class Server:
         try:
             while should_continue:
                 try:
-                    message: str = recv_by_size(
-                        client_socket)  # recieve update
+                    message: bytes = recv_by_size(
+                        client_socket, return_type="bytes")  # recieve update
+                    message: str = aes.decrypt(message)
                     player_information, edibles_eaten = Protocol.parse_client_status_update(
                         message)
                 except:
@@ -95,7 +98,7 @@ class Server:
                     new_edibles, edibles_eaten, thread_id)
                 self.player_update_handler.update_player(player_information)
                 other_player_information: List[PlayerInformation] = self.player_update_handler.get_players(
-                    player_information) # type: ignore
+                    player_information)  # type: ignore
                 edibles_removed, new_edibles_other = self.edible_update_handler.fetch_thread_specific_edible_updates(
                     thread_id)
 
@@ -108,9 +111,10 @@ class Server:
                 if is_eaten:
                     should_continue = False
                 new_edibles = new_edibles + new_edibles_other
-                send_with_size(client_socket, Protocol.generate_server_status_update(new_edibles, other_player_information,
-                                                                                     edibles_removed,
-                                                                                     rad_increase, is_eaten))
+                send_update = Protocol.generate_server_status_update(new_edibles, other_player_information,
+                                                                     edibles_removed,
+                                                                     rad_increase, is_eaten)
+                send_with_size(client_socket, aes.encrypt(send_update))
         except:
             print("Thread error, tracing")
             traceback.print_exc()
@@ -123,7 +127,9 @@ class Server:
         saved_collisions = set()
         while True:
             lock.acquire()
-            players: Dict[str, PlayerInformation] = self.player_update_handler.get_players() # type: ignore
+            # type: ignore
+            players: Dict[str, PlayerInformation] = self.player_update_handler.get_players(
+            )
             collisions = self.__detect_collisions(list(players.values()))
             for collision in collisions:
                 if (collision[0].id, collision[1].id) not in saved_collisions:
@@ -147,12 +153,12 @@ class Server:
                         saved_collisions.add(
                             (collision[0].id, collision[1].id))
             lock.release()
-    
+
     def __detect_collisions(self, players):
         collisions = []
         for player_information in players:
             for collision_search in players:
-                if not (isinstance(collision_search, str) or isinstance(player_information, str)): # Handle "EATEN"
+                if not (isinstance(collision_search, str) or isinstance(player_information, str)):  # Handle "EATEN"
                     if player_information.id != collision_search.id and collision_exists(player_information,
                                                                                          collision_search) and player_information.radius != collision_search.radius:
                         collisions.append(

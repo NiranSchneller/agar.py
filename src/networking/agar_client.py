@@ -5,6 +5,7 @@ import threading
 import uuid
 
 
+from src.networking.encryption.aes import AES
 from src.networking.helpers.world_information import WorldInformation
 from src.networking.encryption.diffie_hellman import DiffieHelman
 from src.constants import PlayerConstants
@@ -43,23 +44,26 @@ class Client:
 
     def start_client(self):
         self.diffie_hellman.key_exchange(self.socket)
+        aes: AES = AES(self.diffie_hellman.final_secret)
 
-        message: str = recv_by_size(self.socket)
+        message: str = aes.decrypt(recv_by_size(
+            self.socket, return_type="bytes"))
         world_size, edibles = game_protocol.Protocol.parse_server_initiate_world(
             message)
         self.world_information.initiate_edibles(edibles)
         self.world_information.width, self.world_information.height = world_size  # type: ignore
 
         self.thread = threading.Thread(
-            target=self.__handle_connection, args=())
+            target=self.__handle_connection, args=(aes,))
         self.thread.start()
 
     """
         Main client func, communicates with the server and updates the server on relevant information
     """
 
-    def __handle_connection(self):
+    def __handle_connection(self, aes):
         unique_id = uuid.uuid4().hex
+
         while self.running:
             message = Protocol.generate_client_status_update(self.player_information.x, self.player_information.y,
                                                              self.player_information.radius,
@@ -69,8 +73,9 @@ class Client:
             self.edible_eaten_list.clear()
 
             # update the server on relevant information
-            send_with_size(self.socket, message)
-            server_reply = recv_by_size(self.socket)
+            send_with_size(self.socket, aes.encrypt(message))
+            server_reply = aes.decrypt(recv_by_size(
+                self.socket, return_type="bytes"))
 
             if Protocol.parse_server_status_update(server_reply) == "EATEN":
                 self.running = False
