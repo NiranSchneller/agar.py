@@ -14,8 +14,6 @@ WIDTH = PlayerCameraConstants.SCREEN_WIDTH
 HEIGHT = PlayerCameraConstants.SCREEN_HEIGHT
 THEME = pygame_menu.themes.THEME_BLUE  # type: ignore
 window = None
-database = None
-
 
 def set_ip_and_port():
     try:
@@ -127,14 +125,12 @@ def check_register_info(db_ip, db_port, username, password):
         print("Account already exists!")
         login_menu()
         return
-    database.add_account(username, password)
     main_menu()
 
 
 if __name__ == '__main__':
     try:
         window = pygame.display.set_mode((WIDTH, HEIGHT))
-        database = DatabaseHelper()
         login_menu()
     except:
         print(f"Menu Crashed! trace: {traceback.print_exc()}")
