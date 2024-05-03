@@ -5,3 +5,5 @@ Implementation of agar.io in python. Features:
 - AES 128 bit
 - Socket communication over TCP (using AES)
 - Realtime multithreaded server-client
+- Smooth animations (using interpolations and transformations)
+- Comfortable GUI
