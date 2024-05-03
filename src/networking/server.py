@@ -2,8 +2,8 @@ import sys
 import threading
 from typing import Dict, List
 
-from networking.information.player_information import PlayerInformation
-from networking.information.players_eaten_information import PlayersEatenInformation
+from src.networking.information.player_information import PlayerInformation
+from src.networking.information.players_eaten_information import PlayersEatenInformation
 from src.constants import EdibleConstants, PlatformConstants
 from src.networking.handlers.collision_detector import CollisionDetector
 from src.networking.handlers.player_update_handler import PlayerUpdateHandler

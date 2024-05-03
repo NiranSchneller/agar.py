@@ -1,5 +1,4 @@
 from typing import Tuple
-from player_camera import PlayerCamera
 from src.constants import *
 
 """
@@ -9,8 +8,8 @@ from src.constants import *
 
 class CoordinateSystemHelper:
 
-    def __init__(self, player_camera: PlayerCamera):
-        self.player_camera: PlayerCamera = player_camera
+    def __init__(self, player_camera):
+        self.player_camera = player_camera
 
     """
         platform_pos -> tuple

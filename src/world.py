@@ -5,7 +5,7 @@
 import random
 from typing import List
 
-from networking.information.player_information import PlayerInformation
+from src.networking.information.player_information import PlayerInformation
 from src.constants import EdibleConstants, PlatformConstants
 from src.edible import Edible
 

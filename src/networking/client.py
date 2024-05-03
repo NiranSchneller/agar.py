@@ -8,8 +8,8 @@ import traceback
 import pygame
 import pygame_menu
 
-from coordinate_system import CoordinateSystemHelper
 from src.constants import GameSettings, PlayerConstants, EdibleConstants, PlatformConstants, PlayerCameraConstants
+from src.coordinate_system import CoordinateSystemHelper
 from src.networking.helpers import game_protocol
 from src.edible import Edible
 from src.networking.information.player_information import PlayerInformation
@@ -295,8 +295,8 @@ def start(name: str, ip: str, port: int, screen: pygame.Surface):
         running = True  # for more than 1st run
         window = screen
         
-        player: Player = Player(name)
-        player_camera: PlayerCamera = PlayerCamera(window)
+        player = Player(name)
+        player_camera = PlayerCamera(window)
         world_information: WorldInformation = WorldInformation()
         player_information = PlayerInformation(
             player.x, player.y, player.radius, player.name)

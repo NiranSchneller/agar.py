@@ -5,7 +5,7 @@
 
 
 from typing import List
-from edible import Edible
+from src.edible import Edible
 
 
 class ThreadUpdateHelper:

@@ -6,7 +6,7 @@
     Every thread has an index in the array from which it pulls the relevant edible information
 """
 from typing import List, Tuple
-from edible import Edible
+from src.edible import Edible
 from src.networking.helpers.thread_update_helper import ThreadUpdateHelper
 
 class EdibleUpdateHandler:
