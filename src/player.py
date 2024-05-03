@@ -4,6 +4,7 @@ import pygame.font
 import random
 from src.constants import *
 from src.interpolator import Interpolator
+from src.networking.helpers.utils import get_max_font_size
 
 """
     Returns Euclidean distance between two points
@@ -19,8 +20,6 @@ def get_distance(pos1, pos2):
     Player class
     Used for drawing and moving the player
 """
-
-POSSIBLE_FONT_SIZES = range(10, 40)
 
 
 class Player:
@@ -39,14 +38,6 @@ class Player:
         The player doesn't actually move, because of that the position should be with respect to actual screen coords
         But when taking into account the mouse, the change in the position should be with respect to the playerCamera
     """
-
-    @staticmethod
-    def get_max_font_size(text, width):
-        for size in reversed(POSSIBLE_FONT_SIZES):
-            font = pygame.font.SysFont(None, size) # type: ignore
-            if font.size(text)[0] <= width:
-                return size
-        return POSSIBLE_FONT_SIZES[0]
 
     def move(self):
         dx, dy = pygame.mouse.get_pos()
@@ -80,7 +71,7 @@ class Player:
                            PlayerConstants.PLAYER_STARTING_OUTLINE_THICKNESS)
 
         cell_size = self.radius*2
-        font_size = int(Player.get_max_font_size(self.name, self.radius))
+        font_size = int(get_max_font_size(self.name, self.radius))
         font = pygame.font.SysFont("Arial", font_size)
         name_surface = font.render(self.name, True, (255, 255, 255))
         name_rect = name_surface.get_rect()

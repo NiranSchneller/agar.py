@@ -2,6 +2,7 @@ import sys
 import threading
 from typing import Dict, List
 
+from src.networking.encryption.diffie_hellman import DiffieHelman
 from src.networking.information.player_information import PlayerInformation
 from src.networking.information.players_eaten_information import PlayersEatenInformation
 from src.constants import EdibleConstants, PlatformConstants
@@ -48,6 +49,8 @@ class Server:
 
         self.player_thread: dict = dict()
 
+        self.diffie_hellman = DiffieHelman(True)
+
         self.collision_detector: CollisionDetector = CollisionDetector()
         self.collision_detector_thread: threading.Thread = threading.Thread(
             target=self.__handle_collisions, args=())
@@ -56,6 +59,8 @@ class Server:
         self.amount_of_clients: int = 0
 
     def __handle_client(self, client_socket: socket.socket, address: str, thread_id: int):
+        self.diffie_hellman.key_exchange(client_socket)
+
         # Send first message
         message: str = Protocol.server_initiate_world(
             (world.width, world.height), world.edibles)

@@ -1,11 +1,18 @@
 import socket, struct
 from typing import Union
-
+import pygame
 DELIMETER = "~"
 SIZE_HEADER_FORMAT = "00000000~"  # n digits for data size + one delimiter
 size_header_size = len(SIZE_HEADER_FORMAT)
 TCP_DEBUG = False
 
+POSSIBLE_FONT_SIZES = range(10, 40)
+def get_max_font_size(text, width):
+    for size in reversed(POSSIBLE_FONT_SIZES):
+        font = pygame.font.SysFont(None, size)  # type: ignore
+        if font.size(text)[0] <= width:
+            return size
+    return POSSIBLE_FONT_SIZES[0]
 
 def recv_by_size(sock, return_type="string") -> str:
     str_size = b""
