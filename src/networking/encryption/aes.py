@@ -4,13 +4,6 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 import os
 
-KEY_DERIVATION = HKDF(
-    algorithm=hashes.SHA256(),
-    length=16,
-    salt=None,
-    info=b""
-)
-
 
 class AES():
     def __init__(self, diffie_hellman_key: int) -> None:
@@ -19,7 +12,12 @@ class AES():
             (diffie_hellman_key.bit_length() + 7) // 8)
 
         # Converts the DH key to a suitable one for AES
-        self.symmetric_key = KEY_DERIVATION.derive(key_in_bytes)
+        self.symmetric_key = HKDF(
+            algorithm=hashes.SHA256(),
+            length=16,
+            salt=None,
+            info=b""
+        ).derive(key_in_bytes)
 
     def encrypt(self, message: str) -> bytes:
         # This is used so that the same plaintext with the same key generates the same key
