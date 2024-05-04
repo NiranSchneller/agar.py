@@ -52,7 +52,7 @@ def handle_client(client_socket: socket.socket, address: str):
                 success = True
         else:
             print("Incorrect protocol! ")
-            exit()
+            raise ValueError("Incorrect protocol!")
         lock.release()
 
         if success:  # Good user for database, exit thread
