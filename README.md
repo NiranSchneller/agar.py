@@ -1,6 +1,6 @@
 # agar.py
 Implementation of agar.io in python. Features:
-- Register/Login using MongoDB
+- Register/Login using SQLite3
 - Full manual implementation of Diffie-Hellman key exchange
 - AES 128 bit
 - Socket communication over TCP (using AES)
