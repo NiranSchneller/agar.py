@@ -17,7 +17,6 @@ import socket
 from src.networking.helpers.utils import send_with_size, recv_by_size
 from src.networking.helpers.game_protocol import Protocol
 from threading import Lock
-import queue
 world: World = None  # type: ignore
 lock: Lock = Lock()
 
