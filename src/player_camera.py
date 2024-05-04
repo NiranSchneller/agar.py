@@ -1,6 +1,8 @@
+from typing import Tuple
 from src.constants import *
 from src.interpolator import Interpolator
 from src.coordinate_system import CoordinateSystemHelper
+from src.networking.helpers.utils import in_bounds
 """
     This class represents the player camera.
     It manages every 'Drawable', including the functionality of making the camera bigger and smaller.
@@ -26,36 +28,47 @@ class PlayerCamera:
         Periodic function, player camera moves with player
         because of this, new pos should be player pos
     """
+
     def update_window(self, player_pos):
         self.window.fill(PlayerCameraConstants.BACKGROUND_COLOR)
         self.update_position(player_pos)
         self.width = self.width_interpolator.lerp()
         self.height = self.height_interpolator.lerp()
 
-
     """
         Scales height and width of the camera,
         the scalars scale the size by the size of the screen
         
     """
+
     def edible_eaten(self, width_scalar, height_scalar):
-        self.width_interpolator.init_lerp(self.width, PlayerCameraConstants.SCREEN_WIDTH * width_scalar)
-        self.height_interpolator.init_lerp(self.height, PlayerCameraConstants.SCREEN_HEIGHT * height_scalar)
+        self.width_interpolator.init_lerp(
+            self.width, PlayerCameraConstants.SCREEN_WIDTH * width_scalar)
+        self.height_interpolator.init_lerp(
+            self.height, PlayerCameraConstants.SCREEN_HEIGHT * height_scalar)
 
     def draw_edible(self, edible):
-        camera_relative_position, edible_radius = self.coordinate_helper.platform_to_screen(
-                                                                                            edible.get_position(),
-                                                                                            edible.radius)
-        if not camera_relative_position[0] < 0:
-            edible.draw(self.window, camera_relative_position, edible_radius)
+        screen_relative_position, edible_radius = self.coordinate_helper.platform_to_screen(
+            edible.get_position(),
+            edible.radius)
+        if PlayerCamera.is_position_on_screen((screen_relative_position[0], screen_relative_position[1])):
+            edible.draw(self.window, screen_relative_position, edible_radius)
 
     """
         Updates position according to player coords
         Position is saved in Platform coordinates, to determine actual location
     """
+
     def update_position(self, player_pos):
         self.x = player_pos[0] - self.width / 2
         self.y = player_pos[1] - self.height / 2
 
     def get_position(self):
         return self.x, self.y
+
+    @staticmethod
+    def is_position_on_screen(pos: Tuple[int, int]) -> bool:
+        pos_x = pos[0]
+        pos_y = pos[1]
+        return in_bounds(pos_x, 0, PlayerCameraConstants.SCREEN_WIDTH) \
+            and in_bounds(pos_y, 0, PlayerCameraConstants.SCREEN_HEIGHT)

@@ -7,7 +7,7 @@ import pygame_menu
 from src.minimap import Minimap
 from src.networking.agar_client import Client
 from src.networking.helpers.world_information import WorldInformation
-from src.constants import GameSettings, PlayerConstants, EdibleConstants
+from src.constants import GameSettings, PlayerCameraConstants, PlayerConstants, EdibleConstants
 from src.coordinate_system import CoordinateSystemHelper
 from src.edible import Edible
 from src.networking.information.player_information import PlayerInformation
@@ -53,12 +53,13 @@ def draw_other_players(other_player_information: List[PlayerInformation], coords
                           PlayerConstants.PLAYER_COLOR, player_information.name, coords)
 
 
-def draw_other_player(x: int, y: int, radius: float, color, name: str, coordinate_helper: CoordinateSystemHelper):
+def draw_other_player(x: int, y: int, radius: float, color, name: str,
+                      coordinate_helper: CoordinateSystemHelper):
     screen_radius = coordinate_helper.platform_to_screen_radius(radius)
     screen_x, screen_y = coordinate_helper.platform_to_screen_coordinates(
         (x, y))
 
-    if not screen_x < 0:
+    if PlayerCamera.is_position_on_screen((screen_x, screen_y)):
         pygame.draw.circle(window, color, (screen_x, screen_y), screen_radius)
         pygame.draw.circle(window, PlayerConstants.PLAYER_OUTLINE_COLOR, (screen_x, screen_y),
                            screen_radius,
