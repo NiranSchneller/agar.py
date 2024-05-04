@@ -14,6 +14,7 @@ HEIGHT = PlayerCameraConstants.SCREEN_HEIGHT
 THEME = pygame_menu.themes.THEME_BLUE  # type: ignore
 window = None
 
+
 def set_ip_and_port():
     try:
         client_menu = pygame_menu.menu.Menu(
@@ -51,6 +52,8 @@ def login_menu():
 
         login_menu.add.vertical_margin(100)
 
+        login_menu.add.button("Guest", main_menu).scale(4, 4, False)
+
         login_menu.add.button("Log in", check_login_info, *
                               (db_ip, db_port, username, password)).scale(4, 4, False)
 
@@ -64,7 +67,6 @@ def login_menu():
 
 def main_menu():
     try:
-        print("dsadasdsasad")
         main_menu = pygame_menu.menu.Menu(
             "agar.py!", WIDTH, HEIGHT, theme=THEME)  # type: ignore
         main_menu.add.button("Play", set_ip_and_port).scale(4, 4, False)
