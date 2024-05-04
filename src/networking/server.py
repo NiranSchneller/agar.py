@@ -17,7 +17,7 @@ import socket
 from src.networking.helpers.utils import send_with_size, recv_by_size
 from src.networking.helpers.game_protocol import Protocol
 from threading import Lock
-
+import queue
 world: World = None  # type: ignore
 lock: Lock = Lock()
 
@@ -100,18 +100,18 @@ class Server:
 
                 self.edible_update_handler.notify_threads_changing_edible_status(
                     new_edibles, edibles_eaten, thread_id)
-                
+
                 self.player_update_handler.update_player(player_information)
-                
+
                 other_player_information: List[PlayerInformation] = self.player_update_handler.get_players(
                     player_information)  # type: ignore
-                
+
                 edibles_removed, new_edibles_other = self.edible_update_handler.fetch_thread_specific_edible_updates(
                     thread_id)
 
                 player_eaten_inf: PlayersEatenInformation = self.collision_detector.players_eaten_helper.get_eaten_status(
                     thread_id)
-                
+
                 rad_increase = player_eaten_inf.get_ate_radius()
                 is_eaten = player_eaten_inf.get_killed()
 
@@ -152,12 +152,16 @@ class Server:
                 if (collision[0].id, collision[1].id) not in saved_collisions:
                     if collision[0].radius > collision[1].radius:
                         self.__collide(
-                            self.player_thread[collision[0].id], self.player_thread[collision[1].id], players[collision[1].id].radius)
+                            self.player_thread[collision[0].id],
+                            self.player_thread[collision[1].id], players[collision[1].id].radius)
+
                         saved_collisions.add(
                             (collision[0].id, collision[1].id))
                     else:
                         self.__collide(
-                            self.player_thread[collision[1].id], self.player_thread[collision[0].id], players[collision[0].id].radius)
+                            self.player_thread[collision[1].id],
+                            self.player_thread[collision[0].id], players[collision[0].id].radius)
+
                         saved_collisions.add(
                             (collision[0].id, collision[1].id))
             lock.release()

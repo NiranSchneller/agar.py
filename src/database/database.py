@@ -50,6 +50,9 @@ class DatabaseHelper(sqlite3.Connection):
 
         return user is not None
 
+    """
+        Uses sha256 algorithm for hashing
+    """
     @staticmethod
     def hash_password(password: str) -> str:
         algo = hashlib.sha256()
