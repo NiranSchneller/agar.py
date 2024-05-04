@@ -5,10 +5,11 @@ import traceback
 
 from src.networking.helpers.utils import recv_by_size, send_with_size
 from src.database.database import DatabaseHelper
-
+from os import path
 
 lock: threading.Lock = threading.Lock()
-database_helper: DatabaseHelper = DatabaseHelper()
+database_helper: DatabaseHelper = DatabaseHelper(
+    path.join("src", "database", "database.sqlite"))
 
 
 def accept(server_socket: socket.socket):

@@ -1,6 +1,5 @@
 from src.database.database_client import DatabaseClient
 from src.constants import PlayerCameraConstants
-from src.database.database import DatabaseHelper
 import src.networking.client as client
 import src.networking.server as server
 import pygame
@@ -42,7 +41,7 @@ def login_menu():
         )
 
         db_port = login_menu.add.text_input(
-            "Database port:", default="0.0.0.0", **input_args)
+            "Database port:", default="0", **input_args)
 
         username = login_menu.add.text_input(
             "Username: ", default="username", **input_args)
