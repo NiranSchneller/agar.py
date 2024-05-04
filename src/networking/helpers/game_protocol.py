@@ -7,7 +7,10 @@ EATEN = "EATEN"
 
 
 class Protocol:
-    """
+
+    @staticmethod
+    def server_initiate_world(level_size: Tuple[int, int], edibles: List[Edible]) -> str:
+        """
         This method constructs a message that is to be sent to the client, requires information about the players
         and the edibles.
 
@@ -21,10 +24,7 @@ class Protocol:
         for example:
         ~20000,20000~200,300,(2,3,4),5~......~
         .... signifies - for each edible
-    """
-
-    @staticmethod
-    def server_initiate_world(level_size: Tuple[int, int], edibles: List[Edible]) -> str:
+        """
         message = ''
         message += f'~{level_size[0]},{level_size[1]}~'
         for edible in edibles:
@@ -122,9 +122,9 @@ class Protocol:
     """
     @staticmethod
     def generate_server_status_update(edibles_created: List[Edible],
-                                    other_player_information: List[PlayerInformation],
-                                    edibles_removed: List[Edible],
-                                    eaten_rad_increase: float, is_eaten: bool) -> str:
+                                      other_player_information: List[PlayerInformation],
+                                      edibles_removed: List[Edible],
+                                      eaten_rad_increase: float, is_eaten: bool) -> str:
         if is_eaten:
             return EATEN
 
@@ -147,7 +147,7 @@ class Protocol:
 
     @staticmethod
     def parse_server_status_update(message: str) -> Union[str, Tuple[List[Edible], List[PlayerInformation],
-                                                                    List[Edible], float]]:
+                                                                     List[Edible], float]]:
         if message.strip() == "EATEN":
             return "EATEN"
 
@@ -164,11 +164,11 @@ class Protocol:
                 radius = int(params[3])
                 edibles_created.append(
                     Edible(edible_x, edible_y, color, radius))
-        
+
         player_information_unparsed = message.split('!"#')[1]
         player_information_list = player_information_unparsed.split('~')
         player_information_parsed: List[PlayerInformation] = []
-        
+
         for information in player_information_list:
             if information != '':
                 information_params = information.split(',')
