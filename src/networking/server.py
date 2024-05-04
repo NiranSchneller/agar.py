@@ -169,8 +169,8 @@ class Server:
         collisions = []
         for player_information in players:
             for collision_search in players:
-                if not isinstance(collision_search, str) or \
-                        isinstance(player_information, str):
+                if (not isinstance(collision_search, str)) and \
+                        (not isinstance(player_information, str)):
 
                     # Handle "EATEN"
                     if player_information.id != collision_search.id \
