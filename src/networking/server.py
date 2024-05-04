@@ -38,12 +38,14 @@ class Server:
     def __init__(self, max_waiting: int, ip: str = '0.0.0.0', port: int = 0):
         self.socket: socket.socket = socket.socket(
             socket.AF_INET, socket.SOCK_STREAM)
+
         self.socket.bind((ip, port))
         self.socket.listen(max_waiting)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         print(
             f"Socket addr and port: {socket.gethostbyname(socket.gethostname())}:{self.socket.getsockname()[1]}")
+
         self.threads: List[threading.Thread] = []
 
         self.player_update_handler: PlayerUpdateHandler = PlayerUpdateHandler()
@@ -61,6 +63,7 @@ class Server:
         self.amount_of_clients: int = 0
 
     def __handle_client(self, client_socket: socket.socket, address: str, thread_id: int):
+
         self.diffie_hellman.key_exchange(client_socket)
         aes: AES = AES(self.diffie_hellman.final_secret)
 
@@ -97,24 +100,31 @@ class Server:
 
                 self.edible_update_handler.notify_threads_changing_edible_status(
                     new_edibles, edibles_eaten, thread_id)
+                
                 self.player_update_handler.update_player(player_information)
+                
                 other_player_information: List[PlayerInformation] = self.player_update_handler.get_players(
                     player_information)  # type: ignore
+                
                 edibles_removed, new_edibles_other = self.edible_update_handler.fetch_thread_specific_edible_updates(
                     thread_id)
 
                 player_eaten_inf: PlayersEatenInformation = self.collision_detector.players_eaten_helper.get_eaten_status(
                     thread_id)
+                
                 rad_increase = player_eaten_inf.get_ate_radius()
-
                 is_eaten = player_eaten_inf.get_killed()
+
                 lock.release()
+
                 if is_eaten:
                     should_continue = False
+
                 new_edibles = new_edibles + new_edibles_other
                 send_update = Protocol.generate_server_status_update(new_edibles, other_player_information,
                                                                      edibles_removed,
                                                                      rad_increase, is_eaten)
+
                 send_with_size(client_socket, aes.encrypt(send_update))
         except:
             print("Thread error, tracing")
@@ -123,6 +133,12 @@ class Server:
         lock.acquire()  # one last time :/
         self.player_update_handler.remove_player(player_information.id)
         lock.release()
+
+    def __collide(self, eating_thread_id: int, eaten_thread_id: int, eaten_radius: float) -> None:
+        self.collision_detector.players_eaten_helper.ate_player(
+            eating_thread_id, eaten_radius)
+        self.collision_detector.players_eaten_helper.player_killed(
+            eaten_thread_id)
 
     def __handle_collisions(self):
         saved_collisions = set()
@@ -135,22 +151,13 @@ class Server:
             for collision in collisions:
                 if (collision[0].id, collision[1].id) not in saved_collisions:
                     if collision[0].radius > collision[1].radius:
-                        eating_thread_id = self.player_thread[collision[0].id]
-                        eaten_thread_id = self.player_thread[collision[1].id]
-                        self.collision_detector.players_eaten_helper.ate_player(eating_thread_id,
-                                                                                players[collision[1].id].radius)
-                        self.collision_detector.players_eaten_helper.player_killed(
-                            eaten_thread_id)
-
+                        self.__collide(
+                            self.player_thread[collision[0].id], self.player_thread[collision[1].id], players[collision[1].id].radius)
                         saved_collisions.add(
                             (collision[0].id, collision[1].id))
                     else:
-                        eating_thread_id = self.player_thread[collision[1].id]
-                        eaten_thread_id = self.player_thread[collision[0].id]
-                        self.collision_detector.players_eaten_helper.ate_player(eating_thread_id,
-                                                                                players[collision[0].id].radius)
-                        self.collision_detector.players_eaten_helper.player_killed(
-                            eaten_thread_id)
+                        self.__collide(
+                            self.player_thread[collision[1].id], self.player_thread[collision[0].id], players[collision[0].id].radius)
                         saved_collisions.add(
                             (collision[0].id, collision[1].id))
             lock.release()
@@ -159,9 +166,13 @@ class Server:
         collisions = []
         for player_information in players:
             for collision_search in players:
-                if not (isinstance(collision_search, str) or isinstance(player_information, str)):  # Handle "EATEN"
-                    if player_information.id != collision_search.id and collision_exists(player_information,
-                                                                                         collision_search) and player_information.radius != collision_search.radius:
+                if not isinstance(collision_search, str) or \
+                        isinstance(player_information, str):
+
+                    # Handle "EATEN"
+                    if player_information.id != collision_search.id \
+                            and collision_exists(player_information, collision_search) and \
+                            player_information.radius != collision_search.radius:
                         collisions.append(
                             (player_information, collision_search))
         return collisions
