@@ -92,16 +92,23 @@ def update_edibles(player: Player, player_camera: PlayerCamera, edibles: List[Ed
 
 def update_window(player: Player, player_camera: PlayerCamera, edibles: List[Edible], client: Client,
                   other_player_information: List[PlayerInformation], world_information_dimensions):
+
     player_camera.update_window(player.get_position())
+
     update_edibles(player, player_camera, edibles, client)
+
     draw_other_players(other_player_information,
                        player_camera.coordinate_helper)
+
     player.execute(PlayerConstants.PLAYER_COLOR, window,
                    player_camera.coordinate_helper)
+
     draw_bigger_players(other_player_information,
                         player_camera.coordinate_helper, player.radius)
+
     update_score()
     client.update_player_information(player.x, player.y, player.radius)
+
     Minimap.update_minimap(list(other_player_information),
                            world_information_dimensions, list(edibles), player, window)
     pygame.display.flip()

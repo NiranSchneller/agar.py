@@ -6,17 +6,17 @@ import socket
 
 LOG_PARAMETERS = False
 
-"""
+
+class DiffieHelman():
+    """
     Adheres to utils.py protocol
-    
+
     An implementation of the encryption protocol diffie-hellman 
     (https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange)
 
     For the case of simplicity, assume server is "Alice" and client is "Bob" (although it does not matter)
-"""
+    """
 
-
-class DiffieHelman():
     def __init__(self, server_side=False) -> None:
         self.server_side = server_side
         self.p = None

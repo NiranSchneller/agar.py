@@ -1,4 +1,5 @@
-import socket, struct
+import socket
+import struct
 from typing import Tuple, Union
 import pygame
 DELIMETER = "~"
@@ -10,7 +11,10 @@ TCP_DEBUG = False
 def in_bounds(value: float, low: float, high: float) -> bool:
     return value >= low and value <= high
 
+
 POSSIBLE_FONT_SIZES = range(10, 40)
+
+
 def get_max_font_size(text, width):
     for size in reversed(POSSIBLE_FONT_SIZES):
         font = pygame.font.SysFont(None, size)  # type: ignore
@@ -18,7 +22,22 @@ def get_max_font_size(text, width):
             return size
     return POSSIBLE_FONT_SIZES[0]
 
+
 def recv_by_size(sock, return_type="string") -> str:
+    """
+    Receives data from a socket by first reading the size of the data and then receiving the data itself.
+
+    This function is designed to receive data from a socket, where the size of the data is sent first
+    as a header before the actual data. It reads the size header, then receives the data based on the
+    size specified in the header.
+
+    Parameters:
+    - sock (socket.socket): The socket object used for communication.
+    - return_type (str): The type of data to return. Default is "string".
+
+    Returns:
+    str or bytes: The received data, either as a string or bytes object, depending on the return_type.
+    """
     str_size = b""
     data_len = 0
     while len(str_size) < size_header_size:
@@ -51,11 +70,24 @@ def recv_by_size(sock, return_type="string") -> str:
         data = b""  # Partial data is like no data !
     if return_type == "string":
         return data.decode()
-    return data # type: ignore
-
+    return data  # type: ignore
 
 
 def send_with_size(sock, data):
+    """
+    Sends data over a socket after prepending it with the size of the data.
+
+    This function sends data over a socket after adding a header that specifies the size of the data.
+    The data is then sent over the socket.
+
+    Parameters:
+    - sock (socket.socket): The socket object used for communication.
+    - data (str or bytes): The data to be sent.
+
+    Returns:
+    None
+
+    """
     len_data = len(data)
     len_data = str(len(data)).zfill(size_header_size - 1) + "~"
     len_data = len_data.encode()

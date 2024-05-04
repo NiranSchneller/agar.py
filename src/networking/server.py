@@ -28,10 +28,22 @@ def collision_exists(player1, player2):
 
 class Server:
     """
-        TCP Connection
+    TCP Connection
 
-        This server handles all clients added to him automatically (threading)
+    This server class manages client connections asynchronously.
+    It provides methods for accepting client connections and handling client communication
+    in separate threads.
 
+    Attributes:
+    - socket (socket.socket): The server socket object used for accepting client connections.
+    - threads (List[threading.Thread]): A list of threads spawned to handle client connections.
+    - player_update_handler (PlayerUpdateHandler): An instance of PlayerUpdateHandler for managing player updates.
+    - edible_update_handler (EdibleUpdateHandler): An instance of EdibleUpdateHandler for managing edible updates.
+    - player_thread (dict): A dictionary mapping player IDs to thread IDs.
+    - diffie_hellman (DiffieHelman): An instance of DiffieHelman for secure communication.
+    - collision_detector (CollisionDetector): An instance of CollisionDetector for detecting player collisions.
+    - collision_detector_thread (threading.Thread): A thread for handling collision detection.
+    - amount_of_clients (int): The number of connected clients.
     """
 
     def __init__(self, max_waiting: int, ip: str = '0.0.0.0', port: int = 0):
@@ -62,7 +74,30 @@ class Server:
         self.amount_of_clients: int = 0
 
     def __handle_client(self, client_socket: socket.socket, address: str, thread_id: int):
+        """
+        Handles communication with a connected client in a separate thread.
 
+        This method is called by the accept function to manage communication with a client
+        connected to the server. It performs key exchange, sends initial messages, and
+        continuously receives and processes status updates from the client.
+
+        Parameters:
+        - client_socket (socket.socket): The socket object used to communicate with the client.
+        - address (str): The address of the client.
+        - thread_id (int): The ID of the thread handling the client connection.
+
+        Returns:
+        None
+
+        Uses:
+        - Diffie-Hellman key exchange for secure communication.
+        - AES encryption for encrypting and decrypting messages.
+        - Protocol module for defining message formats and communication protocols.
+        - Threading module for handling client communication in separate threads.
+        - Locking mechanism for thread safety.
+        - PlayerUpdateHandler, EdibleUpdateHandler, and CollisionDetector for updating game state.
+        - World object for accessing game world information.
+        """
         self.diffie_hellman.key_exchange(client_socket)
         aes: AES = AES(self.diffie_hellman.final_secret)
 
@@ -108,8 +143,9 @@ class Server:
                 edibles_removed, new_edibles_other = self.edible_update_handler.fetch_thread_specific_edible_updates(
                     thread_id)
 
-                player_eaten_inf: PlayersEatenInformation = self.collision_detector.players_eaten_helper.get_eaten_status(
-                    thread_id)
+                player_eaten_inf: PlayersEatenInformation = \
+                    self.collision_detector.players_eaten_helper.get_eaten_status(
+                        thread_id)
 
                 rad_increase = player_eaten_inf.get_ate_radius()
                 is_eaten = player_eaten_inf.get_killed()
@@ -140,6 +176,25 @@ class Server:
             eaten_thread_id)
 
     def __handle_collisions(self):
+        """
+        Detects and handles collisions between players.
+
+        This method is responsible for detecting collisions between players and handling
+        the consequences of these collisions, such as updating player states or triggering
+        specific actions.
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Uses:
+        - PlayerUpdateHandler: to retrieve player information.
+        - __detect_collisions method: to detect collisions between players.
+        - __collide method: to handle individual collisions.
+        - Locking mechanism (lock): for thread safety.
+        """
         saved_collisions = set()
         while True:
             lock.acquire()
@@ -166,6 +221,21 @@ class Server:
             lock.release()
 
     def __detect_collisions(self, players):
+        """
+        Detects collisions between players.
+
+        This method iterates over the provided list of player information and identifies
+        pairs of players that are in collision with each other.
+
+        Parameters:
+        - players (list): A list of PlayerInformation objects representing players.
+
+        Returns:
+        list: A list of tuples representing pairs of players involved in collisions.
+
+        Uses:
+        - collision_exists function: to determine if two players are in collision with each other.
+        """
         collisions = []
         for player_information in players:
             for collision_search in players:
@@ -180,11 +250,20 @@ class Server:
                             (player_information, collision_search))
         return collisions
 
-    """
-        Accepts a new client (blocking)
-    """
-
     def accept(self):
+        """
+        Accepts a new client connection and handles it in a separate thread.
+
+        This method waits for a new client to connect to the server socket. Once a client
+        connection is established, the client's socket and address are obtained. A new thread
+        is then created to handle the client connection using the __handle_client method.
+
+        Parameters:
+        None
+
+        Returns:
+        None
+        """
         client_socket, address = self.socket.accept()
         t = threading.Thread(target=self.__handle_client, args=(
             client_socket, address, self.amount_of_clients))
