@@ -59,7 +59,8 @@ def draw_other_player(x: int, y: int, radius: float, color, name: str,
     screen_x, screen_y = coordinate_helper.platform_to_screen_coordinates(
         (x, y))
 
-    if PlayerCamera.is_position_on_screen((screen_x, screen_y)):
+    global window
+    if PlayerCamera.is_blob_position_on_screen((screen_x, screen_y), screen_radius, window, color):
         pygame.draw.circle(window, color, (screen_x, screen_y), screen_radius)
         pygame.draw.circle(window, PlayerConstants.PLAYER_OUTLINE_COLOR, (screen_x, screen_y),
                            screen_radius,

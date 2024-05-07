@@ -3,6 +3,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 import os
+from cryptography.hazmat.backends.openssl.backend import backend
 
 
 class AES():
@@ -19,14 +20,16 @@ class AES():
             info=b""
         ).derive(key_in_bytes)
 
+        self.algo = algorithms.AES(self.symmetric_key)
+
     def encrypt(self, message: str) -> bytes:
         # This is used so that the same plaintext with the same key generates the same key
         message_bytes = message.encode()
         message_bytes = AES.__pad(message_bytes)
         iv = os.urandom(16)
 
-        cipher = Cipher(algorithms.AES(self.symmetric_key),
-                        modes.CBC(iv), backend=default_backend())
+        cipher = Cipher(self.algo,
+                        modes.CBC(iv), backend=backend)
         encryptor = cipher.encryptor()  # The encryptor using AES-128
 
         ciphertext = encryptor.update(message_bytes) + encryptor.finalize()

@@ -7,11 +7,6 @@ SIZE_HEADER_FORMAT = "00000000~"  # n digits for data size + one delimiter
 size_header_size = len(SIZE_HEADER_FORMAT)
 TCP_DEBUG = False
 
-
-def in_bounds(value: float, low: float, high: float) -> bool:
-    return value >= low and value <= high
-
-
 POSSIBLE_FONT_SIZES = range(10, 40)
 
 

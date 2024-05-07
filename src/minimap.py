@@ -47,7 +47,7 @@ class Minimap():
 
             player_minimap_x = MINIMAP_POSE[0] + absolute_player_minimap_x
             player_minimap_y = MINIMAP_POSE[1] + absolute_player_minimap_y
-            player_minimap_radius = player_information.radius * y_scale_ratio * 6
+            player_minimap_radius = player_information.radius * y_scale_ratio
 
             color = PlayerConstants.PLAYER_COLOR
             if player_information.name == "iAmEdible":

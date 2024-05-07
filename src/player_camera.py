@@ -2,7 +2,6 @@ from typing import Tuple
 from src.constants import *
 from src.interpolator import Interpolator
 from src.coordinate_system import CoordinateSystemHelper
-from src.networking.helpers.utils import in_bounds
 """
     This class represents the player camera.
     It manages every 'Drawable', including the functionality of making the camera bigger and smaller.
@@ -51,7 +50,8 @@ class PlayerCamera:
         screen_relative_position, edible_radius = self.coordinate_helper.platform_to_screen(
             edible.get_position(),
             edible.radius)
-        if PlayerCamera.is_position_on_screen((screen_relative_position[0], screen_relative_position[1])):
+        if PlayerCamera.is_blob_position_on_screen((screen_relative_position[0], screen_relative_position[1]),
+                                                   edible_radius, self.window, EdibleConstants.EDIBLE_COLOR):
             edible.draw(self.window, screen_relative_position, edible_radius)
 
     """
@@ -67,8 +67,9 @@ class PlayerCamera:
         return self.x, self.y
 
     @staticmethod
-    def is_position_on_screen(pos: Tuple[int, int]) -> bool:
+    def is_blob_position_on_screen(pos: Tuple[float, float], radius: float, window, color) -> bool:
         pos_x = pos[0]
         pos_y = pos[1]
-        return in_bounds(pos_x, 0, PlayerCameraConstants.SCREEN_WIDTH) \
-            and in_bounds(pos_y, 0, PlayerCameraConstants.SCREEN_HEIGHT)
+
+        return (pos_x + radius > 0) and pos_x - radius < PlayerCameraConstants.SCREEN_WIDTH \
+            and pos_y + radius > 0 and pos_y - radius < PlayerCameraConstants.SCREEN_HEIGHT
