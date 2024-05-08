@@ -34,7 +34,8 @@ class World:
 
     def delete_edible(self, edible):
         # eq overridden in edible class
-        self.edibles.remove(edible)
+        if edible in self.edibles:
+            self.edibles.remove(edible)
         new_edible = self.spawn_edible(
             EdibleConstants.EDIBLE_RADIUS, EdibleConstants.EDIBLE_COLOR)
         self.edibles.append(new_edible)

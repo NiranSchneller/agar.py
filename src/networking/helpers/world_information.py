@@ -2,6 +2,7 @@ from typing import List
 from src.edible import Edible
 from src.networking.information.player_information import PlayerInformation
 
+
 class WorldInformation:
 
     def __init__(self):
@@ -22,7 +23,8 @@ class WorldInformation:
 
     def remove_edibles(self, edibles_removed: List[Edible]):
         for edible in edibles_removed:
-            self.edibles.remove(edible)
+            if edible in self.edibles:
+                self.edibles.remove(edible)
 
     def set_players(self, other_players: List[PlayerInformation]):
         self.players = other_players

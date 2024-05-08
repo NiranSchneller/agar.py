@@ -2,6 +2,7 @@ from typing import Tuple
 from src.constants import *
 from src.interpolator import Interpolator
 from src.coordinate_system import CoordinateSystemHelper
+import pygame
 """
     This class represents the player camera.
     It manages every 'Drawable', including the functionality of making the camera bigger and smaller.

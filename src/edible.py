@@ -3,7 +3,7 @@ from typing import Tuple
 from pygame import Surface
 from src.constants import *
 import math
-
+import pygame
 """
     Returns Euclidean distance between two points
     positions in: (x,y)
