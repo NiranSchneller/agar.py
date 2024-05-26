@@ -1,3 +1,3 @@
 @ECHO %CD%
-call agarpy\Scripts\activate && python agar.py
+call python agar.py
 pause

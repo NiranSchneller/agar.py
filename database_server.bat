@@ -1,3 +1,3 @@
 @ECHO %CD%
-call agarpy\Scripts\activate && python db_server.py
+call python db_server.py
 pause
